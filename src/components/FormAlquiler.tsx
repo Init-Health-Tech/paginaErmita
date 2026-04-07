@@ -92,7 +92,7 @@ export function FormAlquiler() {
         <label htmlFor="mensaje" className={labelClass}>
           Mensaje u observaciones
         </label>
-        <textarea id="mensaje" name="mensaje" rows={4} className={inputClass} />
+        <textarea id="mensaje" name="mensaje" rows={4} className={`${inputClass} min-h-[8rem]`} />
       </div>
       {status === "error" && (
         <p className="text-sm text-red-800" role="alert">

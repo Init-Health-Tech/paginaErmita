@@ -16,8 +16,8 @@ export default async function VerificarRegistroPage({ params }: Props) {
 
   if (!item) {
     return (
-      <div className="mx-auto max-w-2xl px-5 py-16">
-        <section className="surface rounded-sm p-8">
+      <div className="mx-auto max-w-2xl px-4 py-12 sm:px-5 sm:py-16">
+        <section className="surface rounded-sm p-5 sm:p-8">
           <h1 className="font-[family-name:var(--font-serif)] text-3xl" style={{ fontFamily: "var(--font-serif)" }}>
             Registro no encontrado
           </h1>
@@ -33,8 +33,8 @@ export default async function VerificarRegistroPage({ params }: Props) {
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-5 py-16">
-      <section className="surface rounded-sm p-8">
+    <div className="mx-auto max-w-2xl px-4 py-12 sm:px-5 sm:py-16">
+      <section className="surface rounded-sm p-5 sm:p-8">
         <p className="text-xs uppercase tracking-[0.2em] text-[var(--color-ermita-muted)]">Ermita del Silencio</p>
         <h1 className="mt-3 font-[family-name:var(--font-serif)] text-3xl text-[var(--color-ermita-brown)]" style={{ fontFamily: "var(--font-serif)" }}>
           Registro verificado

@@ -106,7 +106,7 @@ export function FormVisitas() {
         <label htmlFor="vmensaje" className={labelClass}>
           Motivo u observaciones
         </label>
-        <textarea id="vmensaje" name="mensaje" rows={4} className={inputClass} />
+        <textarea id="vmensaje" name="mensaje" rows={4} className={`${inputClass} min-h-[8rem]`} />
       </div>
       {status === "error" && (
         <p className="text-sm text-red-800" role="alert">

@@ -1,0 +1,3 @@
+# Normalizar texto a LF en el repositorio y en el working copy (Next.js / Vercel / Linux).
+# Evita avisos de "LF will be replaced by CRLF" en Windows con core.autocrlf=true.
+* text=auto eol=lf

@@ -85,7 +85,7 @@ export function FormRetiros() {
         <label htmlFor="rmensaje" className={labelClass}>
           Comentario o petición
         </label>
-        <textarea id="rmensaje" name="mensaje" rows={4} className={inputClass} />
+        <textarea id="rmensaje" name="mensaje" rows={4} className={`${inputClass} min-h-[8rem]`} />
       </div>
       {status === "error" && (
         <p className="text-sm text-red-800" role="alert">

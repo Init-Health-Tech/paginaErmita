@@ -12,8 +12,8 @@ export default async function AdminPage() {
 
   if (!authorized) {
     return (
-      <div className="mx-auto max-w-3xl px-5 py-16">
-        <section className="surface rounded-sm p-8">
+      <div className="mx-auto max-w-3xl px-4 py-12 sm:px-5 sm:py-16">
+        <section className="surface rounded-sm p-5 sm:p-8">
           <h1 className="font-[family-name:var(--font-serif)] text-3xl text-[var(--color-ermita-brown)]" style={{ fontFamily: "var(--font-serif)" }}>
             Panel de administracion
           </h1>
@@ -33,28 +33,31 @@ export default async function AdminPage() {
   const visitsToday = stats.at(-1)?.visits ?? 0;
 
   return (
-    <div className="mx-auto max-w-6xl px-5 py-10">
-      <header className="surface rounded-sm p-6">
+    <div className="mx-auto max-w-6xl px-4 py-8 sm:px-5 sm:py-10">
+      <header className="surface rounded-sm p-4 sm:p-6">
         <h1 className="font-[family-name:var(--font-serif)] text-3xl text-[var(--color-ermita-brown)]" style={{ fontFamily: "var(--font-serif)" }}>
           Panel administrador
         </h1>
         <p className="mt-2 text-sm text-[var(--color-ermita-muted)]">
           Registros totales: <strong>{rows.length}</strong> - Visitas registradas hoy: <strong>{visitsToday}</strong>
         </p>
-        <div className="mt-5 flex flex-wrap gap-3">
+        <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-3">
           <a
             href="/api/admin/submissions?format=csv"
-            className="rounded-sm border border-[var(--color-ermita-brown)] bg-[var(--color-ermita-brown)] px-4 py-2 text-sm text-white"
+            className="inline-flex min-h-11 items-center justify-center rounded-sm border border-[var(--color-ermita-brown)] bg-[var(--color-ermita-brown)] px-4 py-2 text-center text-sm text-white sm:min-h-0"
           >
             Descargar registros (CSV)
           </a>
-          <a href="/api/admin/logout" className="rounded-sm border border-[var(--color-ermita-line)] bg-[var(--color-ermita-paper)] px-4 py-2 text-sm">
+          <a
+            href="/api/admin/logout"
+            className="inline-flex min-h-11 items-center justify-center rounded-sm border border-[var(--color-ermita-line)] bg-[var(--color-ermita-paper)] px-4 py-2 text-center text-sm sm:min-h-0"
+          >
             Cerrar sesion
           </a>
         </div>
       </header>
 
-      <section className="mt-8 surface rounded-sm p-6">
+      <section className="mt-6 surface rounded-sm p-4 sm:mt-8 sm:p-6">
         <h2 className="text-lg font-semibold text-[var(--color-ermita-ink)]">Estadisticas diarias (ultimos 14 dias)</h2>
         <div className="mt-4 grid grid-cols-2 gap-2 text-sm sm:grid-cols-4 lg:grid-cols-7">
           {stats.map((item) => (

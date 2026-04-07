@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, Inter } from "next/font/google";
 import "./globals.css";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -27,6 +27,13 @@ export const metadata: Metadata = {
     "Centro de retiros espirituales de la Iglesia Católica. Un lugar de silencio y oración, al servicio de la vida interior.",
 };
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#f8f7f4",
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -34,9 +41,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" className={`${cormorant.variable} ${inter.variable}`}>
-      <body className="min-h-screen flex flex-col">
+      <body className="flex min-h-dvh min-h-screen flex-col">
         <SiteHeader />
-        <main className="flex-1">{children}</main>
+        <main className="relative isolate flex-1">{children}</main>
         <SiteFooter />
       </body>
     </html>

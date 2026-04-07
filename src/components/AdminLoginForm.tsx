@@ -41,14 +41,14 @@ export function AdminLoginForm() {
           name="password"
           type="password"
           required
-          className="mt-1 w-full rounded-sm border border-[var(--color-ermita-line)] bg-white px-3 py-2 text-sm focus:border-[var(--color-ermita-brown)] focus:outline-none"
+          className="mt-1 w-full min-h-11 rounded-sm border border-[var(--color-ermita-line)] bg-white px-3 py-2.5 text-base focus:border-[var(--color-ermita-brown)] focus:outline-none focus:ring-2 focus:ring-[var(--color-ermita-gold)]/35 focus:ring-offset-2 sm:text-sm"
         />
       </div>
       {error ? <p className="text-sm text-red-800">{error}</p> : null}
       <button
         type="submit"
         disabled={loading}
-        className="rounded-sm border border-[var(--color-ermita-brown)] bg-[var(--color-ermita-brown)] px-5 py-2 text-sm text-white disabled:opacity-60"
+        className="w-full min-h-11 rounded-sm border border-[var(--color-ermita-brown)] bg-[var(--color-ermita-brown)] px-5 py-2.5 text-sm text-white transition hover:opacity-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-ermita-gold)]/45 focus-visible:ring-offset-2 disabled:opacity-60 sm:w-auto"
       >
         {loading ? "Ingresando..." : "Entrar al panel"}
       </button>

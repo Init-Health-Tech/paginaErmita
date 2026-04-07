@@ -19,15 +19,44 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
   body {
-    @apply bg-[var(--color-ermita-bg)] text-[var(--color-ermita-ink)] antialiased;
+    @apply text-[var(--color-ermita-ink)] antialiased;
     font-family: var(--font-sans);
     letter-spacing: 0.01em;
+    padding-left: max(0px, env(safe-area-inset-left));
+    padding-right: max(0px, env(safe-area-inset-right));
+    background-color: var(--color-ermita-bg);
+    background-image:
+      radial-gradient(ellipse 130% 85% at 50% -35%, rgba(198, 161, 91, 0.09), transparent 58%),
+      radial-gradient(ellipse 90% 55% at 100% 0%, rgba(234, 227, 217, 0.55), transparent 52%),
+      radial-gradient(ellipse 75% 45% at 0% 100%, rgba(234, 227, 217, 0.4), transparent 48%);
+  }
+
+  ::selection {
+    background-color: color-mix(in srgb, var(--color-ermita-gold) 28%, var(--color-ermita-soft));
+    color: var(--color-ermita-ink);
   }
 
   .surface {
-    @apply border border-[var(--color-ermita-line)] bg-[var(--color-ermita-paper)];
+    @apply border border-[var(--color-ermita-line)]/90 bg-[color-mix(in_srgb,var(--color-ermita-paper)_92%,transparent)];
+    box-shadow:
+      0 1px 2px rgba(43, 43, 43, 0.04),
+      0 14px 36px -14px rgba(43, 43, 43, 0.12);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-float-slow,
+  .animate-ken-burns,
+  .animate-fade-soft,
+  .ui-fade-in {
+    animation: none !important;
+  }
+  html {
+    scroll-behavior: auto;
   }
 }
 
