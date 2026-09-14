@@ -3,17 +3,28 @@
 @theme {
   --font-serif: var(--font-cormorant), ui-serif, Georgia, serif;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --color-ermita-bg: #f8f7f4;
-  --color-ermita-paper: #f8f7f4;
-  --color-ermita-soft: #eae3d9;
-  --color-ermita-ink: #2b2b2b;
-  --color-ermita-muted: #a8a29e;
-  --color-ermita-line: #e7e1d8;
-  --color-ermita-gold: #c6a15b;
-  --color-ermita-accent: #2b2b2b;
-  --color-ermita-accent-soft: #eae3d9;
-  --color-ermita-brown: #2b2b2b;
-  --color-ermita-brown-soft: #eae3d9;
+
+  --color-bg: #f7f3ec;
+  --color-bg-alt: #f2ede3;
+  --color-surface: #ffffff;
+  --color-text: #2c2825;
+  --color-text-muted: #6b6560;
+  --color-accent: #6b7355;
+  --color-accent-dark: #565e44;
+  --color-accent-gold: #c9a86a;
+  --color-border: #e3ddd0;
+
+  --color-ermita-bg: #f7f3ec;
+  --color-ermita-paper: #f2ede3;
+  --color-ermita-soft: #f2ede3;
+  --color-ermita-ink: #2c2825;
+  --color-ermita-muted: #6b6560;
+  --color-ermita-line: #e3ddd0;
+  --color-ermita-gold: #c9a86a;
+  --color-ermita-accent: #6b7355;
+  --color-ermita-accent-soft: #f2ede3;
+  --color-ermita-brown: #565e44;
+  --color-ermita-brown-soft: #f2ede3;
 }
 
 @layer base {
@@ -23,28 +34,32 @@
     text-size-adjust: 100%;
   }
   body {
-    @apply text-[var(--color-ermita-ink)] antialiased;
+    @apply text-[var(--color-text)] antialiased;
     font-family: var(--font-sans);
     letter-spacing: 0.01em;
     padding-left: max(0px, env(safe-area-inset-left));
     padding-right: max(0px, env(safe-area-inset-right));
-    background-color: var(--color-ermita-bg);
+    background-color: var(--color-bg);
     background-image:
-      radial-gradient(ellipse 130% 85% at 50% -35%, rgba(198, 161, 91, 0.09), transparent 58%),
-      radial-gradient(ellipse 90% 55% at 100% 0%, rgba(234, 227, 217, 0.55), transparent 52%),
-      radial-gradient(ellipse 75% 45% at 0% 100%, rgba(234, 227, 217, 0.4), transparent 48%);
+      radial-gradient(ellipse 130% 85% at 50% -35%, color-mix(in srgb, var(--color-accent-gold) 12%, transparent), transparent 58%),
+      radial-gradient(ellipse 90% 55% at 100% 0%, color-mix(in srgb, var(--color-accent) 8%, transparent), transparent 52%),
+      radial-gradient(ellipse 75% 45% at 0% 100%, color-mix(in srgb, var(--color-bg-alt) 80%, transparent), transparent 48%);
   }
 
   ::selection {
-    background-color: color-mix(in srgb, var(--color-ermita-gold) 28%, var(--color-ermita-soft));
-    color: var(--color-ermita-ink);
+    background-color: color-mix(in srgb, var(--color-accent) 22%, var(--color-bg-alt));
+    color: var(--color-text);
   }
 
   .surface {
-    @apply border border-[var(--color-ermita-line)]/90 bg-[color-mix(in_srgb,var(--color-ermita-paper)_92%,transparent)];
+    @apply border border-[var(--color-border)] bg-[var(--color-surface)];
     box-shadow:
-      0 1px 2px rgba(43, 43, 43, 0.04),
-      0 14px 36px -14px rgba(43, 43, 43, 0.12);
+      0 1px 2px color-mix(in srgb, var(--color-text) 4%, transparent),
+      0 14px 36px -14px color-mix(in srgb, var(--color-text) 12%, transparent);
+  }
+
+  .pill {
+    @apply inline-flex items-center justify-center rounded-full border border-[var(--color-border)] bg-[var(--color-bg-alt)] px-4 py-1.5 text-[0.62rem] uppercase tracking-[0.2em] text-[var(--color-text-muted)];
   }
 }
 
