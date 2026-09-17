@@ -51,6 +51,26 @@ export default async function VerificarRegistroPage({ params }: Props) {
             <dt className="font-medium text-[var(--color-ermita-ink)]">Tipo</dt>
             <dd className="capitalize text-[var(--color-ermita-muted)]">{item.type}</dd>
           </div>
+          {item.type === "visitas" ? (
+            <>
+              <div>
+                <dt className="font-medium text-[var(--color-ermita-ink)]">Nombre</dt>
+                <dd className="text-[var(--color-ermita-muted)]">{String(item.payload.nombre ?? "—")}</dd>
+              </div>
+              <div>
+                <dt className="font-medium text-[var(--color-ermita-ink)]">Fecha de visita</dt>
+                <dd className="text-[var(--color-ermita-muted)]">{String(item.payload.fecha_preferida ?? "—")}</dd>
+              </div>
+              <div>
+                <dt className="font-medium text-[var(--color-ermita-ink)]">Personas</dt>
+                <dd className="text-[var(--color-ermita-muted)]">{String(item.payload.personas ?? "—")}</dd>
+              </div>
+              <div>
+                <dt className="font-medium text-[var(--color-ermita-ink)]">Estado</dt>
+                <dd className="capitalize text-[var(--color-ermita-muted)]">{item.status ?? "confirmado"}</dd>
+              </div>
+            </>
+          ) : null}
           <div>
             <dt className="font-medium text-[var(--color-ermita-ink)]">Fecha de registro</dt>
             <dd className="text-[var(--color-ermita-muted)]">{new Date(item.createdAt).toLocaleString("es-MX")}</dd>

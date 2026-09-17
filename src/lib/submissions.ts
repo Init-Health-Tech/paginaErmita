@@ -2,12 +2,16 @@ import { promises as fs } from "fs";
 import path from "path";
 
 export type SubmissionType = "alquiler" | "retiros" | "visitas";
+export type VisitStatus = "confirmado" | "pendiente";
 
 export type SubmissionRecord = {
   id: string;
   type: SubmissionType;
   createdAt: string;
   payload: Record<string, unknown>;
+  qrDataUrl?: string;
+  verifyUrl?: string;
+  status?: VisitStatus;
 };
 
 const DATA_DIR = path.join(process.cwd(), "data");
@@ -22,18 +26,28 @@ async function ensureDataFile(): Promise<void> {
   }
 }
 
+type SaveSubmissionExtra = {
+  id?: string;
+  qrDataUrl?: string;
+  verifyUrl?: string;
+  status?: VisitStatus;
+};
+
 export async function saveSubmission(
   type: SubmissionType,
-  payload: Record<string, unknown>
+  payload: Record<string, unknown>,
+  extra?: SaveSubmissionExtra
 ): Promise<SubmissionRecord> {
   await ensureDataFile();
   const raw = await fs.readFile(DATA_FILE, "utf-8");
   const list: SubmissionRecord[] = JSON.parse(raw);
+  const { id: extraId, ...rest } = extra ?? {};
   const record: SubmissionRecord = {
-    id: crypto.randomUUID(),
+    id: extraId ?? crypto.randomUUID(),
     type,
     createdAt: new Date().toISOString(),
     payload,
+    ...rest,
   };
   list.push(record);
   await fs.writeFile(DATA_FILE, JSON.stringify(list, null, 2), "utf-8");
@@ -72,4 +86,11 @@ export async function getDailyVisitStats(limitDays = 30): Promise<Array<{ date: 
   }
 
   return output.reverse();
+}
+
+export async function listVisitsForDate(isoDate: string): Promise<SubmissionRecord[]> {
+  const list = await listSubmissions();
+  return list
+    .filter((item) => item.type === "visitas" && String(item.payload.fecha_preferida ?? "") === isoDate)
+    .sort((a, b) => String(a.payload.hora_aproximada ?? "").localeCompare(String(b.payload.hora_aproximada ?? "")));
 }

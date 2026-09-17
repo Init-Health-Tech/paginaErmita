@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { FormRetiros } from "@/components/FormRetiros";
+import { ProximosRetiros } from "@/components/ProximosRetiros";
 import { SectionTitle } from "@/components/SectionTitle";
 
 export const metadata: Metadata = {
@@ -7,7 +8,13 @@ export const metadata: Metadata = {
   description: "Información y convocatorias de retiros espirituales en la Ermita del Silencio.",
 };
 
-export default function RetirosPage() {
+type Props = {
+  searchParams: Promise<{ retiro?: string }>;
+};
+
+export default async function RetirosPage({ searchParams }: Props) {
+  const { retiro = "" } = await searchParams;
+
   return (
     <div className="mx-auto max-w-5xl px-4 pb-16 pt-12 sm:px-6 sm:pb-20 sm:pt-16 md:py-24">
       <SectionTitle>Retiros</SectionTitle>
@@ -16,10 +23,13 @@ export default function RetirosPage() {
         sobre próximas convocatorias o materiales de espiritualidad, puede dejarnos sus datos. Trataremos su información con respeto y
         solo para este fin.
       </p>
-      <div className="surface mt-10 rounded-xl p-5 sm:mt-12 sm:rounded-2xl sm:p-8 md:p-10">
+
+      <ProximosRetiros />
+
+      <div id="formulario-retiro" className="surface mt-10 scroll-mt-28 rounded-xl p-5 sm:mt-12 sm:rounded-2xl sm:p-8 md:p-10">
         <h2 className="text-sm font-medium uppercase tracking-[0.15em] text-[var(--color-ermita-muted)]">Solicitar información</h2>
         <div className="mt-7">
-          <FormRetiros />
+          <FormRetiros key={retiro} initialRetiro={retiro} />
         </div>
       </div>
     </div>

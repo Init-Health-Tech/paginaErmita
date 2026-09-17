@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { AdminLoginForm } from "@/components/AdminLoginForm";
 import { isAdminAuthenticated } from "@/lib/adminAuth";
+import { getGuardAccessPath } from "@/lib/guardAccess";
 import { getDailyVisitStats, listSubmissions } from "@/lib/submissions";
 
 export const metadata: Metadata = {
@@ -31,6 +32,9 @@ export default async function AdminPage() {
   const rows = await listSubmissions();
   const stats = await getDailyVisitStats(14);
   const visitsToday = stats.at(-1)?.visits ?? 0;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "";
+  const guardPath = getGuardAccessPath();
+  const guardUrl = siteUrl ? `${siteUrl}${guardPath}` : guardPath;
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-5 sm:py-10">
@@ -40,6 +44,12 @@ export default async function AdminPage() {
         </h1>
         <p className="mt-2 text-sm text-[var(--color-ermita-muted)]">
           Registros totales: <strong>{rows.length}</strong> - Visitas registradas hoy: <strong>{visitsToday}</strong>
+        </p>
+        <p className="mt-3 break-all text-xs text-[var(--color-ermita-muted)]">
+          Lista de acceso para guardias (no compartir en público):{" "}
+          <a href={guardPath} className="underline underline-offset-4">
+            {guardUrl}
+          </a>
         </p>
         <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-3">
           <a
@@ -78,6 +88,7 @@ export default async function AdminPage() {
                 <th className="px-4 py-3 font-medium">Tipo</th>
                 <th className="px-4 py-3 font-medium">Nombre</th>
                 <th className="px-4 py-3 font-medium">Email</th>
+                <th className="px-4 py-3 font-medium">Estado</th>
                 <th className="px-4 py-3 font-medium">ID</th>
               </tr>
             </thead>
@@ -85,12 +96,17 @@ export default async function AdminPage() {
               {rows.map((row) => {
                 const nombre = String(row.payload.nombre ?? "-");
                 const email = String(row.payload.email ?? "-");
+                const visitDate = row.type === "visitas" ? String(row.payload.fecha_preferida ?? "") : "";
                 return (
                   <tr key={row.id} className="border-b border-[var(--color-ermita-line)]/70">
-                    <td className="px-4 py-3 text-[var(--color-ermita-muted)]">{new Date(row.createdAt).toLocaleString("es-MX")}</td>
+                    <td className="px-4 py-3 text-[var(--color-ermita-muted)]">
+                      {new Date(row.createdAt).toLocaleString("es-MX")}
+                      {visitDate ? <span className="mt-1 block text-xs">Visita: {visitDate}</span> : null}
+                    </td>
                     <td className="px-4 py-3 capitalize">{row.type}</td>
                     <td className="px-4 py-3">{nombre}</td>
                     <td className="px-4 py-3">{email}</td>
+                    <td className="px-4 py-3 capitalize">{row.status ?? "—"}</td>
                     <td className="px-4 py-3 font-mono text-xs">{row.id}</td>
                   </tr>
                 );

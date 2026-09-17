@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { isRetiroInterestId, retiroInterestOptions } from "@/lib/upcomingRetreats";
 import { buttonClass, inputClass, labelClass } from "./formStyles";
 
-export function FormRetiros() {
+export function FormRetiros({ initialRetiro = "" }: { initialRetiro?: string }) {
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
   const [code, setCode] = useState("");
+  const defaultRetiro = isRetiroInterestId(initialRetiro) ? initialRetiro : "";
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -19,6 +21,7 @@ export function FormRetiros() {
       email: String(fd.get("email") ?? ""),
       telefono: String(fd.get("telefono") ?? ""),
       ciudad: String(fd.get("ciudad") ?? ""),
+      retiro_interes: String(fd.get("retiro_interes") ?? ""),
       como_conocio: String(fd.get("como_conocio") ?? ""),
       mensaje: String(fd.get("mensaje") ?? ""),
     };
@@ -74,6 +77,27 @@ export function FormRetiros() {
           Ciudad o localidad
         </label>
         <input id="ciudad" name="ciudad" className={inputClass} />
+      </div>
+      <div>
+        <label htmlFor="retiro_interes" className={labelClass}>
+          Retiro de interés <span className="text-red-800">*</span>
+        </label>
+        <select
+          id="retiro_interes"
+          name="retiro_interes"
+          required
+          defaultValue={defaultRetiro}
+          className={inputClass}
+        >
+          <option value="" disabled>
+            Seleccione una opción
+          </option>
+          {retiroInterestOptions.map((option) => (
+            <option key={option.id} value={option.id}>
+              {option.label}
+            </option>
+          ))}
+        </select>
       </div>
       <div>
         <label htmlFor="como_conocio" className={labelClass}>
