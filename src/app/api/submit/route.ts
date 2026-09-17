@@ -1,12 +1,25 @@
 import { NextResponse } from "next/server";
-import { sendNotificationEmail } from "@/lib/email";
+import { sendNotificationEmail, sendVisitorQrEmail } from "@/lib/email";
 import { saveSubmission, type SubmissionType } from "@/lib/submissions";
+import { isAtLeastOneDayAhead, parseISODate } from "@/lib/dates";
+import { isDateBlockedForVisits } from "@/lib/visitAvailability";
 import QRCode from "qrcode";
 
 const TYPES: SubmissionType[] = ["alquiler", "retiros", "visitas"];
 
 function jsonError(message: string, status: number) {
   return NextResponse.json({ ok: false, error: message }, { status });
+}
+
+function buildQr(verifyUrl: string) {
+  return QRCode.toDataURL(verifyUrl, {
+    margin: 1,
+    color: {
+      dark: "#2f241d",
+      light: "#fbf8f3",
+    },
+    width: 280,
+  });
 }
 
 export async function POST(request: Request) {
@@ -30,17 +43,39 @@ export async function POST(request: Request) {
   delete payload.type;
 
   try {
-    const record = await saveSubmission(type as SubmissionType, payload);
+    if (type === "visitas") {
+      const requestedDate = parseISODate(String(payload.fecha_preferida ?? ""));
+      if (!requestedDate) {
+        return jsonError("Indique una fecha válida (AAAA-MM-DD).", 400);
+      }
+      payload.fecha_preferida = requestedDate;
+
+      if (!isAtLeastOneDayAhead(requestedDate)) {
+        return jsonError("Las visitas deben registrarse con al menos un día de anticipación. Elija otra fecha.", 400);
+      }
+
+      if (await isDateBlockedForVisits(requestedDate)) {
+        return jsonError("Esa fecha no está disponible para visitas, por favor elige otra fecha", 409);
+      }
+    }
+
+    const id = crypto.randomUUID();
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
-    const verifyUrl = `${baseUrl}/verificar/${record.id}`;
-    const qrDataUrl = await QRCode.toDataURL(verifyUrl, {
-      margin: 1,
-      color: {
-        dark: "#2f241d",
-        light: "#fbf8f3",
-      },
-      width: 280,
-    });
+    const verifyUrl = `${baseUrl}/verificar/${id}`;
+    const qrDataUrl = type === "visitas" ? await buildQr(verifyUrl) : undefined;
+
+    const record = await saveSubmission(
+      type as SubmissionType,
+      payload,
+      type === "visitas"
+        ? {
+            id,
+            qrDataUrl,
+            verifyUrl,
+            status: "confirmado",
+          }
+        : { id }
+    );
 
     const label =
       type === "alquiler"
@@ -54,7 +89,31 @@ export async function POST(request: Request) {
       text: `Nueva solicitud (${record.id})\nFecha: ${record.createdAt}\n\n${JSON.stringify(payload, null, 2)}`,
     });
 
-    return NextResponse.json({ ok: true, id: record.id, verifyUrl, qrDataUrl });
+    let emailSent = false;
+    if (type === "visitas" && typeof payload.email === "string" && qrDataUrl) {
+      try {
+        emailSent = await sendVisitorQrEmail({
+          to: payload.email,
+          nombre: String(payload.nombre ?? ""),
+          fecha: String(payload.fecha_preferida ?? ""),
+          personas: String(payload.personas ?? ""),
+          id: record.id,
+          verifyUrl,
+          qrDataUrl,
+        });
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    return NextResponse.json({
+      ok: true,
+      id: record.id,
+      verifyUrl,
+      qrDataUrl: qrDataUrl ?? null,
+      emailSent,
+      status: record.status ?? null,
+    });
   } catch (e) {
     console.error(e);
     return jsonError("No se pudo guardar la solicitud. Intente más tarde.", 500);

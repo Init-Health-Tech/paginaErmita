@@ -5,7 +5,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 
 const cormorant = Cormorant_Garamond({
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["400", "500", "600"],
   subsets: ["latin"],
   variable: "--font-cormorant",
   display: "swap",
@@ -31,7 +31,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#f8f7f4",
+  themeColor: "#f7f3ec",
 };
 
 export default function RootLayout({
