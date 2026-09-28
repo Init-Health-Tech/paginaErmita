@@ -22,7 +22,7 @@ export async function Amenidades() {
   const amenities = await listAmenities();
 
   return (
-    <section className="mt-16 md:mt-24" aria-labelledby="amenidades-title">
+    <section aria-labelledby="amenidades-title">
       <p className="eyebrow">La casa</p>
       <h2 id="amenidades-title" className="heading-2 mt-4">
         Amenidades

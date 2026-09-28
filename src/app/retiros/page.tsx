@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { FormRetiros } from "@/components/FormRetiros";
+import { PageGallery } from "@/components/PageGallery";
 import { PageHero } from "@/components/PageHero";
 import { ProximosRetiros } from "@/components/ProximosRetiros";
-import { pageHeroes } from "@/lib/homePhotos";
+import { pageGalleries, pageHeroes } from "@/lib/homePhotos";
 
 export const dynamic = "force-dynamic";
 
@@ -21,23 +22,34 @@ export default async function RetirosPage({ searchParams }: Props) {
   return (
     <>
       <PageHero eyebrow="Retiros" title="Retiros" src={pageHeroes.retiros.src} alt={pageHeroes.retiros.alt} />
-      <div className="shell section-pad">
-        <p className="intro-copy">
-          Los retiros se anuncian con tiempo y se viven en un clima de recogimiento y escucha de la Palabra. Si desea recibir información
-          sobre próximas convocatorias o materiales de espiritualidad, puede dejarnos sus datos. Trataremos su información con respeto y
-          solo para este fin.
-        </p>
+      <section className="band-bg section-pad">
+        <div className="shell">
+          <p className="copy-wide">
+            Los retiros se anuncian con tiempo y se viven en un clima de recogimiento y escucha de la Palabra. Si desea recibir información
+            sobre próximas convocatorias o materiales de espiritualidad, puede dejarnos sus datos. Trataremos su información con respeto y
+            solo para este fin.
+          </p>
+          <div className="mt-10">
+            <PageGallery photos={pageGalleries.retiros} />
+          </div>
+        </div>
+      </section>
 
-        <ProximosRetiros />
+      <section className="band-sand section-pad">
+        <div className="shell">
+          <ProximosRetiros />
+        </div>
+      </section>
 
-        <section id="formulario-retiro" className="mt-16 scroll-mt-28 border-t border-[var(--color-line)] pt-10 md:mt-24">
+      <section id="formulario-retiro" className="band-sage section-pad scroll-mt-28">
+        <div className="shell">
           <p className="eyebrow">Inscripción</p>
           <h2 className="heading-2 mt-4">Solicitar información</h2>
           <div className="mt-10">
             <FormRetiros key={retiro} initialRetiro={retiro} />
           </div>
-        </section>
-      </div>
+        </div>
+      </section>
     </>
   );
 }

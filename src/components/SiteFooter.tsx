@@ -41,7 +41,7 @@ export function SiteFooter({ isAdmin = false }: { isAdmin?: boolean }) {
             <p className="eyebrow mt-4 text-[var(--color-on-dark)]">Orden Franciscana Seglar — TOR</p>
           </div>
           <nav aria-label="Pie de página">
-            <ul className="space-y-3 text-sm">
+            <ul className="flex flex-wrap gap-x-6 gap-y-3 text-sm">
               {links.map((item) => (
                 <li key={item.href}>
                   <Link href={item.href} className="link-arrow link-on-dark">
@@ -53,14 +53,6 @@ export function SiteFooter({ isAdmin = false }: { isAdmin?: boolean }) {
           </nav>
           <div className="text-sm leading-relaxed">
             <p>Faldas del Itza · zona privada, acceso con registro previo</p>
-            <p className="mt-4">
-              <Link href="/contacto" className="link-arrow link-on-dark">
-                Contacto
-                <span className="arrow" aria-hidden>
-                  →
-                </span>
-              </Link>
-            </p>
           </div>
         </div>
         <div className="shell flex items-center justify-between border-t border-[color-mix(in_srgb,var(--color-on-dark)_15%,transparent)] py-5 text-xs tracking-[0.08em] text-[color-mix(in_srgb,var(--color-on-dark)_75%,transparent)]">

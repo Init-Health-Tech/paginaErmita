@@ -4,6 +4,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { CoverPhoto } from "@/components/CoverPhoto";
 import { lifeGallery } from "@/lib/homePhotos";
 
+const galleryRows = [lifeGallery.slice(0, 2), lifeGallery.slice(2, 5), lifeGallery.slice(5)];
+
 export function LifeAtErmita() {
   const [index, setIndex] = useState<number | null>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -52,37 +54,44 @@ export function LifeAtErmita() {
   const active = index == null ? null : lifeGallery[index];
 
   return (
-    <section className="section-pad">
+    <section className="band-bg section-pad">
       <div className="shell">
         <p className="eyebrow">Vida en la Ermita</p>
-        <h2 className="heading-2 measure mt-5">La casa, la capilla y el bosque</h2>
-        <p className="measure mt-6 text-[var(--color-muted)]">
+        <h2 className="heading-2 mt-5">La casa, la capilla y el bosque</h2>
+        <p className="copy-wide mt-6 text-[var(--color-muted)]">
           La Ermita del Silencio acoge a quienes buscan retiro, oración y acompañamiento. La comunidad cuida una vida sencilla, con
           silencio, liturgia y servicio. La capilla, las salas, los cuartos y los espacios exteriores están dispuestos para el
           recogimiento, con lo necesario y nada que distraiga.
         </p>
 
-        <ul className="mt-14 grid grid-cols-2 gap-4 md:mt-16 md:grid-cols-12 md:gap-6">
-          {lifeGallery.map((photo, photoIndex) => (
-            <li key={photo.src} className={photo.frame}>
-              <figure className="flex h-full flex-col">
-                <button
-                  type="button"
-                  className={`relative block w-full overflow-hidden text-left ${photo.ratio}`}
-                  onClick={() => setIndex(photoIndex)}
-                >
-                  <CoverPhoto
-                    src={photo.src}
-                    alt={photo.alt}
-                    sizes="(min-width: 768px) 50vw, 100vw"
-                    className="gallery-zoom"
-                  />
-                </button>
-                <figcaption className="mt-3 text-sm text-[var(--color-muted)]">{photo.caption}</figcaption>
-              </figure>
-            </li>
+        <div className="mt-10 flex flex-col gap-6 md:mt-12 md:gap-8">
+          {galleryRows.map((row) => (
+            <ul key={row[0]?.src} className="grid grid-cols-2 gap-4 md:grid-cols-12 md:gap-6">
+              {row.map((photo) => {
+                const photoIndex = lifeGallery.findIndex((item) => item.src === photo.src);
+                return (
+                  <li key={photo.src} className={photo.frame}>
+                    <figure>
+                      <button
+                        type="button"
+                        className="relative block h-40 w-full overflow-hidden text-left sm:h-52 md:h-64"
+                        onClick={() => setIndex(photoIndex)}
+                      >
+                        <CoverPhoto
+                          src={photo.src}
+                          alt={photo.alt}
+                          sizes="(min-width: 768px) 40vw, 50vw"
+                          className="gallery-zoom"
+                        />
+                      </button>
+                      <figcaption className="mt-3 text-sm text-[var(--color-muted)]">{photo.caption}</figcaption>
+                    </figure>
+                  </li>
+                );
+              })}
+            </ul>
           ))}
-        </ul>
+        </div>
 
         <p className="eyebrow mt-14 border-t border-[var(--color-line)] pt-8">
           Capilla <span className="text-[var(--color-accent)]">·</span> Comedor <span className="text-[var(--color-accent)]">·</span>{" "}

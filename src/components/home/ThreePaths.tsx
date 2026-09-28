@@ -31,18 +31,18 @@ const paths = [
 
 export function ThreePaths() {
   return (
-    <section className="section-pad pt-0">
-      <div className="shell flex flex-col gap-20 md:gap-28">
+    <section className="band-sand section-pad">
+      <div className="path-stack">
         {paths.map((item, index) => {
           const reverse = index % 2 === 1;
           return (
-            <article key={item.href} className="grid items-center gap-8 md:grid-cols-12 md:gap-16">
-              <figure className={`md:col-span-7 ${reverse ? "md:order-2" : ""}`}>
-                <div className="relative aspect-[4/5] overflow-hidden">
+            <article key={item.href} className={reverse ? "path-row path-row-reverse" : "path-row"}>
+              <figure className="path-photo">
+                <div className="relative aspect-[4/5] max-h-[68vh] w-full overflow-hidden">
                   <CoverPhoto src={item.photo.src} alt={item.photo.alt} sizes="(min-width: 768px) 58vw, 100vw" />
                 </div>
               </figure>
-              <div className={`md:col-span-5 ${reverse ? "md:order-1" : ""}`}>
+              <div className="path-copy">
                 <p className="eyebrow">{item.eyebrow}</p>
                 <h3 className="heading-3 mt-4">{item.title}</h3>
                 <p className="mt-4 text-[var(--color-muted)]">{item.text}</p>

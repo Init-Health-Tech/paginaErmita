@@ -5,6 +5,8 @@
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 
   --color-bg: #f6f3ee;
+  --color-sand: #ece5d8;
+  --color-sage: #dfe3d6;
   --color-bg-alt: #efeae2;
   --color-surface: #ffffff;
   --color-text: #2a2926;
@@ -187,21 +189,68 @@
 }
 
 .section-pad {
-  padding-top: 4rem;
-  padding-bottom: 4rem;
+  padding-top: clamp(2.5rem, 1.15rem + 3.2vw, 4.75rem);
+  padding-bottom: clamp(2.5rem, 1.15rem + 3.2vw, 4.75rem);
+}
+
+.band-bg,
+.band-sand,
+.band-sage {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+}
+
+.band-bg {
+  background-color: var(--color-bg);
+}
+
+.band-sand {
+  background-color: var(--color-sand);
+}
+
+.band-sage {
+  background-color: var(--color-sage);
+}
+
+.path-stack {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2.25rem, 1.25rem + 2vw, 3.5rem);
+}
+
+.path-row {
+  display: grid;
+  gap: 1.75rem;
+}
+
+.path-copy {
+  padding-inline: 1.25rem;
 }
 
 @media (min-width: 768px) {
-  .section-pad {
-    padding-top: 6rem;
-    padding-bottom: 6rem;
+  .path-row,
+  .path-row-reverse {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    align-items: center;
+    column-gap: clamp(1.5rem, 3vw, 3.5rem);
   }
-}
 
-@media (min-width: 1024px) {
-  .section-pad {
-    padding-top: 8.5rem;
-    padding-bottom: 8.5rem;
+  .path-row-reverse {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  }
+
+  .path-row-reverse .path-photo {
+    order: 2;
+  }
+
+  .path-row .path-copy {
+    padding-left: clamp(1.25rem, 2vw, 2rem);
+    padding-right: max(2rem, calc((100vw - 1200px) / 2));
+  }
+
+  .path-row-reverse .path-copy {
+    padding-right: clamp(1.25rem, 2vw, 2rem);
+    padding-left: max(2rem, calc((100vw - 1200px) / 2));
   }
 }
 
@@ -220,6 +269,13 @@
   max-width: 62ch;
   text-align: justify;
   text-justify: inter-word;
+}
+
+.copy-wide {
+  max-width: 100%;
+  text-align: justify;
+  text-justify: inter-word;
+  hyphens: auto;
 }
 
 .form-grid {

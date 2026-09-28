@@ -168,24 +168,24 @@
       "title": "Capilla",
       "phrase": "Oración y silencio",
       "icon": "capilla",
-      "src": "/Fotos/casa/exterior-vista-casa-05.jpeg",
-      "alt": "Fachada de piedra de la capilla, con arco Silentium tibi laus y campanario"
+      "src": "/Fotos/editadas/capilla-terraza.jpg",
+      "alt": "Capilla de piedra, campanario y terraza abierta al bosque"
     },
     {
       "id": "comedor",
       "title": "Comedor",
       "phrase": "Mesa en comunidad",
       "icon": "comedor",
-      "src": "/Fotos/itza/exterior-vista-itza-08.jpeg",
-      "alt": "Vista de la casa y techos de teja entre el bosque"
+      "src": "/Fotos/editadas/terraza-bosque.jpg",
+      "alt": "Terraza de piedra abierta al bosque, con la cruz y el ángel"
     },
     {
       "id": "cuartos",
       "title": "Cuartos",
       "phrase": "Descanso sencillo",
       "icon": "cuartos",
-      "src": "/Fotos/casa/exterior-vista-casa-06.jpeg",
-      "alt": "Torre de piedra con techo de teja y vista al bosque"
+      "src": "/Fotos/editadas/torre-cascada.jpg",
+      "alt": "Torre de piedra, escalinata y cascada sobre la roca"
     }
   ],
   "retreats": [

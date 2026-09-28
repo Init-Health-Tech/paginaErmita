@@ -8,7 +8,6 @@ const publicNav = [
   { href: "/", label: "Inicio" },
   { href: "/alquiler", label: "Alquiler" },
   { href: "/retiros", label: "Retiros" },
-  { href: "/visitas", label: "Visitas" },
 ];
 
 const adminNav = [

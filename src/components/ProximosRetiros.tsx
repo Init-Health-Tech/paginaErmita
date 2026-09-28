@@ -6,7 +6,7 @@ export async function ProximosRetiros() {
   const retreats = await listRetreats();
 
   return (
-    <section className="mt-16 md:mt-24" aria-labelledby="proximos-retiros-title">
+    <section aria-labelledby="proximos-retiros-title">
       <p className="eyebrow">Agenda</p>
       <h2 id="proximos-retiros-title" className="heading-2 mt-4">
         Próximos retiros

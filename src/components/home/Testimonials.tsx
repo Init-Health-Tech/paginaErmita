@@ -15,7 +15,7 @@ const testimonials = [
 
 export function Testimonials() {
   return (
-    <section className="section-pad" aria-labelledby="testimonios-titulo">
+    <section className="band-sage section-pad" aria-labelledby="testimonios-titulo">
       <div className="shell">
         <p id="testimonios-titulo" className="eyebrow">
           Testimonios

@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { Amenidades } from "@/components/Amenidades";
 import { FormAlquiler } from "@/components/FormAlquiler";
+import { PageGallery } from "@/components/PageGallery";
 import { PageHero } from "@/components/PageHero";
 import { formatMxn } from "@/lib/contentModel";
-import { pageHeroes } from "@/lib/homePhotos";
+import { pageGalleries, pageHeroes } from "@/lib/homePhotos";
 import { getRentalCosts } from "@/lib/siteContent";
 
 export const dynamic = "force-dynamic";
@@ -31,41 +32,54 @@ export default async function AlquilerPage() {
         src={pageHeroes.alquiler.src}
         alt={pageHeroes.alquiler.alt}
       />
-      <div className="shell section-pad">
-        <p className="intro-copy">
-          La casa puede acoger retiros de grupos parroquiales, movimientos eclesiales y comunidades que busquen un tiempo de oración en
-          silencio. La solicitud no supone reserva: nos pondremos en contacto para concretar fechas, capacidad y condiciones pastorales.
-        </p>
+      <section className="band-bg section-pad">
+        <div className="shell">
+          <p className="copy-wide">
+            La casa puede acoger retiros de grupos parroquiales, movimientos eclesiales y comunidades que busquen un tiempo de oración en
+            silencio. La solicitud no supone reserva: nos pondremos en contacto para concretar fechas, capacidad y condiciones pastorales.
+          </p>
+          <div className="mt-10">
+            <PageGallery photos={pageGalleries.alquiler} />
+          </div>
+        </div>
+      </section>
 
-        <section className="mt-16 border-t border-[var(--color-line)] pt-10 md:mt-24" aria-labelledby="costo-alquiler-title">
+      <section className="band-sand section-pad" aria-labelledby="costo-alquiler-title">
+        <div className="shell">
           <p className="eyebrow">Condiciones</p>
           <h2 id="costo-alquiler-title" className="heading-2 mt-4">
             Costo del alquiler
           </h2>
-          {costs.summary ? <p className="measure mt-6 text-[var(--color-muted)]">{costs.summary}</p> : null}
+          {costs.summary ? <p className="copy-wide mt-6 text-[var(--color-muted)]">{costs.summary}</p> : null}
           {price ? <p className="mt-6">Tarifa vigente: {price}.</p> : null}
           {costs.packages.length > 0 ? (
             <ul className="mt-8 border-b border-[var(--color-line)]">
               {costs.packages.map((item) => (
                 <li key={item.id} className="border-t border-[var(--color-line)] py-6">
                   <p className="font-medium">{item.name}</p>
-                  {item.description ? <p className="mt-2 max-w-[62ch] text-[var(--color-muted)]">{item.description}</p> : null}
+                  {item.description ? <p className="copy-wide mt-2 text-[var(--color-muted)]">{item.description}</p> : null}
                 </li>
               ))}
             </ul>
           ) : null}
-        </section>
+        </div>
+      </section>
 
-        <Amenidades />
+      <section className="band-sage section-pad">
+        <div className="shell">
+          <Amenidades />
+        </div>
+      </section>
 
-        <section className="mt-16 border-t border-[var(--color-line)] pt-10 md:mt-24">
+      <section className="band-bg section-pad">
+        <div className="shell">
           <p className="eyebrow">Solicitud</p>
           <h2 className="heading-2 mt-4">Formulario de solicitud</h2>
           <div className="mt-10">
             <FormAlquiler />
           </div>
-        </section>
-      </div>
+        </div>
+      </section>
     </>
   );
 }
