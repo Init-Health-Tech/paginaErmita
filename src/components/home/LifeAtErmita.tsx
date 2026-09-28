@@ -1,186 +1,138 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { CoverPhoto } from "@/components/CoverPhoto";
-import { generalGallery, instalacionesGallery } from "@/lib/homePhotos";
-
-type TabId = "general" | "instalaciones";
-
-const tabs: Array<{ id: TabId; label: string }> = [
-  { id: "general", label: "Información general" },
-  { id: "instalaciones", label: "Instalaciones" },
-];
-
-const GALLERY = {
-  general: generalGallery,
-  instalaciones: instalacionesGallery,
-};
-
-const copy: Record<TabId, { text: string }> = {
-  general: {
-    text: "La Ermita del Silencio es un espacio de acogida para quienes buscan retiro, oración y acompañamiento espiritual. La comunidad cuida una vida sencilla, con ritmos de silencio, liturgia y servicio fraterno. Cada actividad se realiza en un ambiente de respeto, orden y discreción.",
-  },
-  instalaciones: {
-    text: "Las instalaciones están orientadas al recogimiento: capilla, salas para dinámicas de retiro, zonas de descanso y espacios exteriores para oración personal. La casa ofrece lo necesario con sobriedad, privilegiando la funcionalidad y el clima espiritual por encima de lo accesorio.",
-  },
-};
-
-const bullets = [
-  "Ambiente franciscano: humildad, sencillez y obediencia.",
-  "Espacios para grupos y retiro personal.",
-  "Entorno sereno para jornadas de oración.",
-];
-
-const stats = [
-  { value: "25", label: "Fotos" },
-  { value: "3", label: "Servicios" },
-  { value: "365", label: "Días de oración" },
-];
+import { lifeGallery } from "@/lib/homePhotos";
 
 export function LifeAtErmita() {
-  const [tab, setTab] = useState<TabId>("general");
-  const [index, setIndex] = useState(0);
+  const [index, setIndex] = useState<number | null>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const touchX = useRef<number | null>(null);
 
-  const images = GALLERY[tab];
-  const activeTabLabel = tabs.find((item) => item.id === tab)?.label ?? "";
-  const activeImage = images[index] ?? images[0];
+  const close = useCallback(() => setIndex(null), []);
+  const prev = useCallback(() => {
+    setIndex((current) => (current == null ? current : (current - 1 + lifeGallery.length) % lifeGallery.length));
+  }, []);
+  const next = useCallback(() => {
+    setIndex((current) => (current == null ? current : (current + 1) % lifeGallery.length));
+  }, []);
 
-  const goPrev = () => {
-    setIndex((prev) => (prev - 1 + images.length) % images.length);
-  };
+  useEffect(() => {
+    if (index == null) return;
+    const root = dialogRef.current;
+    const previous = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const focusable = () => Array.from(root?.querySelectorAll<HTMLElement>("button") ?? []);
+    focusable()[0]?.focus();
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") close();
+      if (event.key === "ArrowRight") next();
+      if (event.key === "ArrowLeft") prev();
+      if (event.key !== "Tab") return;
+      const nodes = focusable();
+      if (nodes.length === 0) return;
+      const first = nodes[0];
+      const last = nodes[nodes.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+      previous?.focus();
+    };
+  }, [index, close, next, prev]);
 
-  const goNext = () => {
-    setIndex((prev) => (prev + 1) % images.length);
-  };
+  const active = index == null ? null : lifeGallery[index];
 
   return (
-    <section className="surface relative mt-4 overflow-hidden rounded-2xl bg-[var(--color-bg-alt)] p-4 sm:mt-6 sm:rounded-3xl sm:p-6 md:p-8">
-      <div className="flex flex-col gap-4 border-b border-[var(--color-border)] pb-4 sm:flex-row sm:items-center sm:justify-between sm:gap-3 sm:pb-5">
-        <h2
-          className="text-2xl font-medium text-[var(--color-text)] sm:text-3xl"
-          style={{ fontFamily: "var(--font-serif)" }}
-        >
-          Vida en la Ermita
-        </h2>
+    <section className="section-pad">
+      <div className="shell">
+        <p className="eyebrow">Vida en la Ermita</p>
+        <h2 className="heading-2 measure mt-5">La casa, la capilla y el bosque</h2>
+        <p className="measure mt-6 text-[var(--color-muted)]">
+          La Ermita del Silencio acoge a quienes buscan retiro, oración y acompañamiento. La comunidad cuida una vida sencilla, con
+          silencio, liturgia y servicio. La capilla, las salas, los cuartos y los espacios exteriores están dispuestos para el
+          recogimiento, con lo necesario y nada que distraiga.
+        </p>
+
+        <ul className="mt-14 grid grid-cols-2 gap-4 md:mt-16 md:grid-cols-12 md:gap-6">
+          {lifeGallery.map((photo, photoIndex) => (
+            <li key={photo.src} className={photo.frame}>
+              <figure className="flex h-full flex-col">
+                <button
+                  type="button"
+                  className={`relative block w-full overflow-hidden text-left ${photo.ratio}`}
+                  onClick={() => setIndex(photoIndex)}
+                >
+                  <CoverPhoto
+                    src={photo.src}
+                    alt={photo.alt}
+                    sizes="(min-width: 768px) 50vw, 100vw"
+                    className="gallery-zoom"
+                  />
+                </button>
+                <figcaption className="mt-3 text-sm text-[var(--color-muted)]">{photo.caption}</figcaption>
+              </figure>
+            </li>
+          ))}
+        </ul>
+
+        <p className="eyebrow mt-14 border-t border-[var(--color-line)] pt-8">
+          Capilla <span className="text-[var(--color-accent)]">·</span> Comedor <span className="text-[var(--color-accent)]">·</span>{" "}
+          Cuartos
+        </p>
+      </div>
+
+      {active && index != null ? (
         <div
-          className="grid w-full grid-cols-2 gap-1 rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg)] p-1.5 sm:flex sm:w-auto sm:rounded-full sm:p-1"
-          role="tablist"
-          aria-label="Secciones de la Ermita"
+          ref={dialogRef}
+          role="dialog"
+          aria-modal="true"
+          aria-label={active.caption}
+          className="fixed inset-0 z-[80] flex items-center justify-center bg-black/92 px-4 py-8 text-[var(--color-on-dark)]"
+          onClick={(event) => {
+            if (event.target === event.currentTarget) close();
+          }}
+          onTouchStart={(event) => {
+            touchX.current = event.changedTouches[0]?.clientX ?? null;
+          }}
+          onTouchEnd={(event) => {
+            const start = touchX.current;
+            const end = event.changedTouches[0]?.clientX;
+            if (start == null || end == null) return;
+            if (end - start > 40) prev();
+            if (start - end > 40) next();
+          }}
         >
-          {tabs.map((item) => {
-            const selected = tab === item.id;
-            return (
-              <button
-                key={item.id}
-                type="button"
-                role="tab"
-                aria-selected={selected}
-                onClick={() => {
-                  setTab(item.id);
-                  setIndex(0);
-                }}
-                className={`min-h-11 rounded-xl px-2 py-2.5 text-center text-[0.7rem] font-medium leading-tight tracking-[0.03em] transition-all duration-300 sm:min-h-0 sm:rounded-full sm:px-5 sm:py-2 sm:text-sm sm:tracking-[0.04em] ${
-                  selected
-                    ? "bg-[var(--color-accent-dark)] text-white shadow-md shadow-[var(--color-accent-dark)]/20"
-                    : "text-[var(--color-text-muted)] hover:bg-[var(--color-surface)] hover:text-[var(--color-accent)]"
-                }`}
-              >
-                {item.label}
-              </button>
-            );
-          })}
+          <button type="button" className="absolute right-4 top-4 px-3 py-2 text-2xl leading-none" onClick={close}>
+            <span className="sr-only">Cerrar</span>
+            <span aria-hidden>×</span>
+          </button>
+          <button type="button" className="absolute left-2 top-1/2 -translate-y-1/2 px-3 py-4 text-3xl md:left-6" onClick={prev}>
+            <span className="sr-only">Anterior</span>
+            <span aria-hidden>←</span>
+          </button>
+          <figure className="flex max-h-full w-full max-w-5xl flex-col items-center">
+            <div className="relative h-[68vh] w-full">
+              <CoverPhoto src={active.src} alt={active.alt} sizes="100vw" />
+            </div>
+            <figcaption className="mt-4 text-sm text-[color-mix(in_srgb,var(--color-on-dark)_80%,transparent)]">
+              {active.caption}
+            </figcaption>
+          </figure>
+          <button type="button" className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-4 text-3xl md:right-6" onClick={next}>
+            <span className="sr-only">Siguiente</span>
+            <span aria-hidden>→</span>
+          </button>
         </div>
-      </div>
-
-      <div className="mt-5 grid gap-6 sm:mt-7 sm:gap-8 md:grid-cols-5">
-        <article className="md:col-span-2">
-          <p className="text-sm leading-relaxed text-[var(--color-text-muted)] sm:leading-8">{copy[tab].text}</p>
-          <ul className="mt-4 space-y-2 text-sm leading-relaxed text-[var(--color-text-muted)] sm:mt-5 sm:leading-7">
-            {bullets.map((item) => (
-              <li key={item}>• {item}</li>
-            ))}
-          </ul>
-          <div className="mt-6 grid grid-cols-3 gap-2 sm:mt-7 sm:gap-3">
-            {stats.map((stat) => (
-              <div
-                key={stat.label}
-                className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-1.5 py-3 text-center shadow-sm sm:px-2 sm:py-4"
-              >
-                <p
-                  className="text-xl font-medium tabular-nums text-[var(--color-text)] sm:text-2xl"
-                  style={{ fontFamily: "var(--font-serif)" }}
-                >
-                  {stat.value}
-                </p>
-                <p className="mt-0.5 text-[9px] uppercase leading-tight tracking-[0.12em] text-[var(--color-text-muted)] sm:text-[10px] sm:tracking-[0.14em]">
-                  {stat.label}
-                </p>
-              </div>
-            ))}
-          </div>
-        </article>
-
-        <div className="md:col-span-3">
-          <div className="relative overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-alt)] shadow-[0_16px_48px_-24px_color-mix(in_srgb,var(--color-text)_16%,transparent)]">
-            <div className="relative h-56 w-full overflow-hidden sm:h-80 md:h-96">
-              {activeImage ? (
-                <CoverPhoto
-                  key={activeImage.src}
-                  src={activeImage.src}
-                  alt={activeImage.alt}
-                  sizes="(min-width: 768px) 55vw, 100vw"
-                />
-              ) : null}
-            </div>
-            <div className="absolute left-2 top-2 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)]/92 px-2.5 py-1 text-[0.65rem] tracking-[0.06em] text-[var(--color-text-muted)] sm:left-4 sm:top-4 sm:px-3 sm:text-xs sm:tracking-[0.08em]">
-              {activeTabLabel}
-            </div>
-            <div className="absolute bottom-2 left-2 right-2 grid grid-cols-2 gap-2 sm:bottom-3 sm:left-3 sm:right-3 sm:flex sm:items-center sm:justify-between">
-              <span className="col-span-2 flex justify-center sm:order-2 sm:col-span-1 sm:flex-none">
-                <span
-                  className="rounded-md border border-[var(--color-border)] bg-[var(--color-surface)]/92 px-2.5 py-1 text-[0.65rem] tabular-nums text-[var(--color-text-muted)] sm:px-2 sm:text-xs"
-                  aria-live="polite"
-                >
-                  {index + 1} / {images.length}
-                </span>
-              </span>
-              <button
-                type="button"
-                onClick={goPrev}
-                className="min-h-11 rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-xs text-[var(--color-text)] transition hover:border-[var(--color-accent)] hover:bg-[var(--color-accent-dark)] hover:text-white sm:order-1 sm:min-h-0 sm:py-2 sm:text-sm"
-              >
-                Anterior
-              </button>
-              <button
-                type="button"
-                onClick={goNext}
-                className="min-h-11 rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-xs text-[var(--color-text)] transition hover:border-[var(--color-accent)] hover:bg-[var(--color-accent-dark)] hover:text-white sm:order-3 sm:min-h-0 sm:py-2 sm:text-sm"
-              >
-                Siguiente
-              </button>
-            </div>
-          </div>
-
-          <div className="mt-4 flex gap-2 overflow-x-auto pb-1">
-            {images.map((image, i) => (
-              <button
-                key={image.src}
-                type="button"
-                onClick={() => setIndex(i)}
-                className={`relative h-14 w-20 shrink-0 overflow-hidden rounded-lg border-2 transition-shadow duration-300 ${
-                  i === index
-                    ? "border-[var(--color-accent-gold)] shadow-md ring-2 ring-[var(--color-accent-gold)]/30"
-                    : "border-[var(--color-border)] opacity-90 hover:border-[var(--color-accent)] hover:opacity-100"
-                }`}
-                aria-label={`Ir a ${image.alt}`}
-                aria-current={i === index ? "true" : undefined}
-              >
-                <CoverPhoto src={image.src} alt="" sizes="80px" />
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
+      ) : null}
     </section>
   );
 }

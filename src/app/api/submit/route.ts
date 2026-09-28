@@ -3,6 +3,8 @@ import { sendNotificationEmail, sendVisitorQrEmail } from "@/lib/email";
 import { saveSubmission, type SubmissionType } from "@/lib/submissions";
 import { isAtLeastOneDayAhead, parseISODate } from "@/lib/dates";
 import { isDateBlockedForVisits } from "@/lib/visitAvailability";
+import { visitDateField, type FormSection } from "@/lib/contentModel";
+import { getFormFields } from "@/lib/siteContent";
 import QRCode from "qrcode";
 
 const TYPES: SubmissionType[] = ["alquiler", "retiros", "visitas"];
@@ -43,19 +45,34 @@ export async function POST(request: Request) {
   delete payload.type;
 
   try {
+    const fields = await getFormFields(type as FormSection);
+    for (const field of fields) {
+      const value = payload[field.id] == null ? "" : String(payload[field.id]).trim();
+      payload[field.id] = value;
+      if (field.required && !value) {
+        return jsonError(`Complete el campo: ${field.label}`, 400);
+      }
+      if (field.type === "email" && value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+        return jsonError("Indique un correo electrónico válido.", 400);
+      }
+    }
+
     if (type === "visitas") {
-      const requestedDate = parseISODate(String(payload.fecha_preferida ?? ""));
-      if (!requestedDate) {
-        return jsonError("Indique una fecha válida (AAAA-MM-DD).", 400);
-      }
-      payload.fecha_preferida = requestedDate;
-
-      if (!isAtLeastOneDayAhead(requestedDate)) {
-        return jsonError("Las visitas deben registrarse con al menos un día de anticipación. Elija otra fecha.", 400);
-      }
-
-      if (await isDateBlockedForVisits(requestedDate)) {
-        return jsonError("Esa fecha no está disponible para visitas, por favor elige otra fecha", 409);
+      const dateField = visitDateField(fields);
+      const rawDate = dateField ? String(payload[dateField.id] ?? "") : "";
+      if (dateField && rawDate) {
+        const requestedDate = parseISODate(rawDate);
+        if (!requestedDate) {
+          return jsonError("Indique una fecha válida (AAAA-MM-DD).", 400);
+        }
+        if (!isAtLeastOneDayAhead(requestedDate)) {
+          return jsonError("Las visitas deben registrarse con al menos un día de anticipación. Elija otra fecha.", 400);
+        }
+        if (await isDateBlockedForVisits(requestedDate)) {
+          return jsonError("Esa fecha no está disponible para visitas, por favor elige otra fecha", 409);
+        }
+        payload[dateField.id] = requestedDate;
+        payload.fecha_preferida = requestedDate;
       }
     }
 

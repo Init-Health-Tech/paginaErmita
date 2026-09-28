@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import { Amenidades } from "@/components/Amenidades";
 import { FormVisitas } from "@/components/FormVisitas";
-import { SectionTitle } from "@/components/SectionTitle";
+import { PageHero } from "@/components/PageHero";
+import { pageHeroes } from "@/lib/homePhotos";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Visitas",
@@ -10,22 +13,25 @@ export const metadata: Metadata = {
 
 export default function VisitasPage() {
   return (
-    <div className="mx-auto max-w-5xl px-4 pb-16 pt-12 sm:px-6 sm:pb-20 sm:pt-16 md:py-24">
-      <SectionTitle>Visitas</SectionTitle>
-      <p className="mt-6 max-w-3xl text-pretty text-[var(--color-ermita-ink)]/75 leading-relaxed sm:mt-8 sm:leading-8">
-        La Ermita es ante todo un lugar de oración. Las visitas se coordinan para no interferir con los retiros ni con la vida comunitaria.
-        Las visitas deben registrarse con al menos un día de anticipación para control de acceso. Verificaremos la disponibilidad y te
-        confirmaremos tu ingreso.
-      </p>
+    <>
+      <PageHero eyebrow="Visitas" title="Visitas" src={pageHeroes.visitas.src} alt={pageHeroes.visitas.alt} />
+      <div className="shell section-pad">
+        <p className="intro-copy">
+          La Ermita es ante todo un lugar de oración. Las visitas se coordinan para no interferir con los retiros ni con la vida comunitaria.
+          Las visitas deben registrarse con al menos un día de anticipación para control de acceso. Verificaremos la disponibilidad y te
+          confirmaremos tu ingreso.
+        </p>
 
-      <Amenidades />
+        <Amenidades />
 
-      <div className="surface mt-10 rounded-xl p-5 sm:mt-12 sm:rounded-2xl sm:p-8 md:p-10">
-        <h2 className="text-sm font-medium uppercase tracking-[0.15em] text-[var(--color-ermita-muted)]">Registro de visita</h2>
-        <div className="mt-7">
-          <FormVisitas />
-        </div>
+        <section className="mt-16 border-t border-[var(--color-line)] pt-10 md:mt-24">
+          <p className="eyebrow">Acceso</p>
+          <h2 className="heading-2 mt-4">Registro de visita</h2>
+          <div className="mt-10">
+            <FormVisitas />
+          </div>
+        </section>
       </div>
-    </div>
+    </>
   );
 }

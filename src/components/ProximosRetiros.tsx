@@ -1,41 +1,45 @@
 import Link from "next/link";
-import { upcomingRetreats } from "@/lib/upcomingRetreats";
+import { formatRetreatDates } from "@/lib/contentModel";
+import { listRetreats } from "@/lib/siteContent";
 
-export function ProximosRetiros() {
+export async function ProximosRetiros() {
+  const retreats = await listRetreats();
+
   return (
-    <section className="mt-10 sm:mt-12" aria-labelledby="proximos-retiros-title">
-      <h2
-        id="proximos-retiros-title"
-        className="text-2xl font-medium text-[var(--color-text)] sm:text-3xl"
-        style={{ fontFamily: "var(--font-serif)" }}
-      >
+    <section className="mt-16 md:mt-24" aria-labelledby="proximos-retiros-title">
+      <p className="eyebrow">Agenda</p>
+      <h2 id="proximos-retiros-title" className="heading-2 mt-4">
         Próximos retiros
       </h2>
-      {/* TODO: reemplazar fechas de ejemplo con las convocatorias reales cuando estén definidas */}
-      <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[var(--color-text-muted)]">
-        Contenido de ejemplo a reemplazar. Las fechas siguientes son ilustrativas hasta confirmar las convocatorias reales.
-      </p>
-      <ul className="mt-6 grid gap-4 sm:grid-cols-3">
-        {upcomingRetreats.map((retiro) => (
-          <li key={retiro.id} className="surface flex h-full flex-col rounded-2xl p-5 sm:p-6">
-            <span className="pill w-fit">Ejemplo</span>
-            <h3
-              className="mt-4 text-xl font-medium text-[var(--color-text)]"
-              style={{ fontFamily: "var(--font-serif)" }}
+      {retreats.length === 0 ? (
+        <p className="mt-8 text-[var(--color-muted)]">Por ahora no hay retiros programados.</p>
+      ) : (
+        <ul className="mt-8 border-b border-[var(--color-line)]">
+          {retreats.map((retiro) => (
+            <li
+              key={retiro.id}
+              className="grid gap-4 border-t border-[var(--color-line)] py-8 md:grid-cols-[11rem_1fr_auto] md:items-center md:gap-10"
             >
-              {retiro.title}
-            </h3>
-            <p className="mt-2 text-sm font-medium tracking-wide text-[var(--color-accent-dark)]">{retiro.datesLabel}</p>
-            <p className="mt-3 flex-1 text-sm leading-relaxed text-[var(--color-text-muted)]">{retiro.description}</p>
-            <Link
-              href={`/retiros?retiro=${retiro.id}#formulario-retiro`}
-              className="mt-5 inline-flex min-h-11 items-center justify-center rounded-xl border border-[var(--color-accent-dark)] px-5 py-2 text-sm font-medium tracking-[0.05em] text-[var(--color-accent-dark)] transition hover:bg-[var(--color-accent-dark)] hover:text-white"
-            >
-              Inscribirme
-            </Link>
-          </li>
-        ))}
-      </ul>
+              <p className="font-serif text-[clamp(1.75rem,3vw,2.5rem)] font-light leading-none">
+                {formatRetreatDates(retiro.startDate, retiro.endDate)}
+              </p>
+              <div>
+                <h3 className="heading-3">{retiro.name}</h3>
+                {retiro.description ? <p className="mt-3 text-[var(--color-muted)]">{retiro.description}</p> : null}
+                {retiro.capacity != null ? (
+                  <p className="mt-3 text-sm text-[var(--color-muted)]">Cupo: {retiro.capacity} personas</p>
+                ) : null}
+              </div>
+              <Link href={`/retiros?retiro=${retiro.id}#formulario-retiro`} className="link-arrow">
+                Inscribirme
+                <span className="arrow" aria-hidden>
+                  →
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
     </section>
   );
 }

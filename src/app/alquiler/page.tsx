@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
 import { Amenidades } from "@/components/Amenidades";
 import { FormAlquiler } from "@/components/FormAlquiler";
-import { SectionTitle } from "@/components/SectionTitle";
+import { PageHero } from "@/components/PageHero";
+import { formatMxn } from "@/lib/contentModel";
+import { pageHeroes } from "@/lib/homePhotos";
+import { getRentalCosts } from "@/lib/siteContent";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Alquiler para retiros",
@@ -9,37 +14,58 @@ export const metadata: Metadata = {
     "Solicitud de alquiler de la Ermita del Silencio para retiros espirituales de grupos católicos.",
 };
 
-export default function AlquilerPage() {
+export default async function AlquilerPage() {
+  const costs = await getRentalCosts();
+  const price =
+    costs.model === "per_person_per_day" && costs.pricePerPersonPerDay != null
+      ? `${formatMxn(costs.pricePerPersonPerDay)} por persona por día`
+      : costs.model === "flat_rate" && costs.flatRate != null
+        ? formatMxn(costs.flatRate)
+        : null;
+
   return (
-    <div className="mx-auto max-w-5xl px-4 pb-16 pt-12 sm:px-6 sm:pb-20 sm:pt-16 md:py-24">
-      <SectionTitle>Alquiler para retiros espirituales</SectionTitle>
-      <p className="mt-6 max-w-3xl text-pretty text-[var(--color-ermita-ink)]/75 leading-relaxed sm:mt-8 sm:leading-8">
-        La casa puede acoger retiros de grupos parroquiales, movimientos eclesiales y comunidades que busquen un tiempo de oración en
-        silencio. La solicitud no supone reserva: nos pondremos en contacto para concretar fechas, capacidad y condiciones pastorales.
-      </p>
-
-      <section className="surface mt-10 rounded-2xl p-5 sm:mt-12 sm:p-8" aria-labelledby="costo-alquiler-title">
-        <h2
-          id="costo-alquiler-title"
-          className="text-2xl font-medium text-[var(--color-text)] sm:text-3xl"
-          style={{ fontFamily: "var(--font-serif)" }}
-        >
-          Costo del alquiler
-        </h2>
-        <p className="mt-4 max-w-3xl text-sm leading-relaxed text-[var(--color-text-muted)] sm:text-base sm:leading-8">
-          El costo del alquiler se calcula según el número de personas y los días de estancia. Contamos con distintos paquetes de
-          alimentación (desayuno, comida y cena) que se detallan al confirmar tu solicitud.
+    <>
+      <PageHero
+        eyebrow="Alquiler"
+        title="Alquiler para retiros espirituales"
+        src={pageHeroes.alquiler.src}
+        alt={pageHeroes.alquiler.alt}
+      />
+      <div className="shell section-pad">
+        <p className="intro-copy">
+          La casa puede acoger retiros de grupos parroquiales, movimientos eclesiales y comunidades que busquen un tiempo de oración en
+          silencio. La solicitud no supone reserva: nos pondremos en contacto para concretar fechas, capacidad y condiciones pastorales.
         </p>
-      </section>
 
-      <Amenidades />
+        <section className="mt-16 border-t border-[var(--color-line)] pt-10 md:mt-24" aria-labelledby="costo-alquiler-title">
+          <p className="eyebrow">Condiciones</p>
+          <h2 id="costo-alquiler-title" className="heading-2 mt-4">
+            Costo del alquiler
+          </h2>
+          {costs.summary ? <p className="measure mt-6 text-[var(--color-muted)]">{costs.summary}</p> : null}
+          {price ? <p className="mt-6">Tarifa vigente: {price}.</p> : null}
+          {costs.packages.length > 0 ? (
+            <ul className="mt-8 border-b border-[var(--color-line)]">
+              {costs.packages.map((item) => (
+                <li key={item.id} className="border-t border-[var(--color-line)] py-6">
+                  <p className="font-medium">{item.name}</p>
+                  {item.description ? <p className="mt-2 max-w-[62ch] text-[var(--color-muted)]">{item.description}</p> : null}
+                </li>
+              ))}
+            </ul>
+          ) : null}
+        </section>
 
-      <div className="surface mt-10 rounded-xl p-5 sm:mt-12 sm:rounded-2xl sm:p-8 md:p-10">
-        <h2 className="text-sm font-medium uppercase tracking-[0.15em] text-[var(--color-ermita-muted)]">Formulario de solicitud</h2>
-        <div className="mt-7">
-          <FormAlquiler />
-        </div>
+        <Amenidades />
+
+        <section className="mt-16 border-t border-[var(--color-line)] pt-10 md:mt-24">
+          <p className="eyebrow">Solicitud</p>
+          <h2 className="heading-2 mt-4">Formulario de solicitud</h2>
+          <div className="mt-10">
+            <FormAlquiler />
+          </div>
+        </section>
       </div>
-    </div>
+    </>
   );
 }

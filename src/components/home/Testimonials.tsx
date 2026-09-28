@@ -15,42 +15,20 @@ const testimonials = [
 
 export function Testimonials() {
   return (
-    <section className="mt-16 sm:mt-20 md:mt-24" aria-labelledby="testimonios-titulo">
-      <h2
-        id="testimonios-titulo"
-        className="text-center text-2xl font-medium text-[var(--color-text)] sm:text-3xl"
-        style={{ fontFamily: "var(--font-serif)" }}
-      >
-        Voces de quienes han pasado por la Ermita
-      </h2>
-      <p className="mx-auto mt-3 max-w-xl text-center text-[0.65rem] uppercase tracking-[0.16em] text-[var(--color-text-muted)]">
-        Testimonios de ejemplo — sustituir más adelante
-      </p>
-
-      <ul className="mt-8 grid gap-4 sm:mt-10 sm:gap-5 md:grid-cols-3">
-        {testimonials.map((item) => (
-          <li key={item.attribution}>
-            <figure className="surface flex h-full flex-col rounded-2xl p-5 sm:p-6">
-              <span
-                className="text-3xl leading-none text-[var(--color-accent-gold)]"
-                style={{ fontFamily: "var(--font-serif)" }}
-                aria-hidden
-              >
-                “
-              </span>
-              <blockquote
-                className="mt-3 flex-1 text-sm italic leading-relaxed text-[var(--color-text)] sm:text-[0.95rem] sm:leading-7"
-                style={{ fontFamily: "var(--font-serif)" }}
-              >
-                {item.quote}
-              </blockquote>
-              <figcaption className="mt-5 text-xs tracking-[0.02em] text-[var(--color-text-muted)]">
-                — {item.attribution}
-              </figcaption>
-            </figure>
-          </li>
-        ))}
-      </ul>
+    <section className="section-pad" aria-labelledby="testimonios-titulo">
+      <div className="shell">
+        <p id="testimonios-titulo" className="eyebrow">
+          Testimonios
+        </p>
+        <ul className="mt-12 grid gap-12 md:mt-16 md:grid-cols-3 md:gap-10">
+          {testimonials.map((item) => (
+            <li key={item.attribution} className="border-t border-[var(--color-line)] pt-6">
+              <blockquote className="font-serif text-[1.5rem] font-normal italic leading-snug">{item.quote}</blockquote>
+              <p className="eyebrow mt-6">— {item.attribution}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
     </section>
   );
 }

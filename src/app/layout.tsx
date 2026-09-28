@@ -3,16 +3,18 @@ import { Cormorant_Garamond, Inter } from "next/font/google";
 import "./globals.css";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
+import { isAdminAuthenticated } from "@/lib/adminAuth";
 
 const cormorant = Cormorant_Garamond({
-  weight: ["400", "500", "600"],
+  weight: ["300", "400"],
+  style: ["normal", "italic"],
   subsets: ["latin"],
   variable: "--font-cormorant",
   display: "swap",
 });
 
 const inter = Inter({
-  weight: ["400", "500", "600"],
+  weight: ["400", "500"],
   subsets: ["latin"],
   variable: "--font-inter",
   display: "swap",
@@ -31,20 +33,22 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#f7f3ec",
+  themeColor: "#f6f3ee",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const isAdmin = await isAdminAuthenticated();
+
   return (
     <html lang="es" className={`${cormorant.variable} ${inter.variable}`}>
       <body className="flex min-h-dvh min-h-screen flex-col">
-        <SiteHeader />
-        <main className="relative isolate flex-1">{children}</main>
-        <SiteFooter />
+        <SiteHeader isAdmin={isAdmin} />
+        <main className="relative flex-1">{children}</main>
+        <SiteFooter isAdmin={isAdmin} />
       </body>
     </html>
   );

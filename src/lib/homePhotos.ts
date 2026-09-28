@@ -3,67 +3,126 @@ export type SitePhoto = {
   alt: string;
 };
 
+export type GalleryPhoto = SitePhoto & {
+  caption: string;
+  frame: string;
+  ratio: string;
+};
+
 const itza = (file: string) => `/Fotos/itza/${file}`;
 const casa = (file: string) => `/Fotos/casa/${file}`;
 
 export const homePhotos = {
   hero: {
     src: casa("exterior-vista-casa-03.jpeg"),
-    alt: "Fachada de la capilla de la Ermita, con arco de entrada, teja y cruz blanca contra la roca",
+    alt: "Fachada rosa y blanca de la capilla, con cruz y teja, apoyada en la roca",
   },
   banner: {
-    src: itza("exterior-vista-itza-07.jpeg"),
-    alt: "Ángel de bronce junto a la cruz de piedra y el arco Pax vobis, con el volcán al fondo",
+    src: itza("exterior-vista-itza-08.jpeg"),
+    alt: "Vista panorámica del bosque y el volcán, con los techos de la casa en primer plano",
   },
   quote: {
     src: itza("exterior-vista-itza-02.jpeg"),
-    alt: "San Francisco de bronce extendiendo la paloma junto a la cruz tallada y el volcán",
+    alt: "Escultura de San Francisco de bronce liberando una paloma junto a la cruz",
   },
   cta: {
     src: itza("exterior-vista-itza-10.jpeg"),
-    alt: "Atardecer dorado sobre el volcán humeante, con una cruz de metal en primer plano",
+    alt: "Atardecer sobre el volcán, con una cruz de metal entre los pinos",
   },
 } as const satisfies Record<string, SitePhoto>;
 
-export const generalGallery: SitePhoto[] = [
-  {
-    src: itza("exterior-vista-itza-01.jpeg"),
-    alt: "Vista al volcán nevado enmarcada entre la roca y los pinos",
+export const pathPhotos = {
+  alquiler: {
+    src: casa("exterior-vista-casa-06.jpeg"),
+    alt: "Torre de piedra con techo de teja y el bosque al fondo",
   },
-  {
-    src: itza("exterior-vista-itza-02.jpeg"),
-    alt: "San Francisco de bronce liberando una paloma junto a la cruz",
-  },
-  {
+  retiros: {
     src: itza("exterior-vista-itza-03.jpeg"),
-    alt: "Arcos de piedra, cruz Pax y talla de Jesús en la roca con el volcán al fondo",
+    alt: "Arcos de piedra y cruces orientados hacia el volcán",
   },
-  {
+  visitas: {
+    src: casa("exterior-vista-casa-05.jpeg"),
+    alt: "Entrada de piedra con el arco que dice Silentium tibi laus",
+  },
+} as const satisfies Record<string, SitePhoto>;
+
+export const pageHeroes = {
+  alquiler: {
+    src: itza("exterior-vista-itza-09.jpeg"),
+    alt: "Bosque de pinos y el volcán, con una cruz de metal en primer plano",
+  },
+  retiros: {
+    src: itza("exterior-vista-itza-10.jpeg"),
+    alt: "Atardecer anaranjado sobre el volcán y el bosque",
+  },
+  visitas: {
     src: itza("exterior-vista-itza-04.jpeg"),
-    alt: "Muro con azulejo Shalom y cruz verde frente al volcán",
+    alt: "Muro de piedra y cruz frente al volcán",
+  },
+} as const satisfies Record<string, SitePhoto>;
+
+export const lifeGallery: GalleryPhoto[] = [
+  {
+    src: itza("exterior-vista-itza-07.jpeg"),
+    alt: "Ángel de bronce junto a una cruz tallada, con el volcán al fondo",
+    caption: "El ángel",
+    frame: "col-span-2 md:col-span-7 md:row-span-2",
+    ratio: "aspect-[4/5]",
   },
   {
     src: itza("exterior-vista-itza-06.jpeg"),
-    alt: "Fuente circular de mosaico azul, venado de bronce y arcos con el volcán al fondo",
+    alt: "Fuente circular de mosaico azul, con el venado de bronce y el volcán",
+    caption: "La fuente",
+    frame: "col-span-1 md:col-span-5",
+    ratio: "aspect-[4/3]",
   },
   {
-    src: itza("exterior-vista-itza-08.jpeg"),
-    alt: "Vista panorámica de la casa, techos de teja y el volcán entre nubes",
+    src: casa("exterior-vista-casa-01.jpeg"),
+    alt: "Mural de azulejo en el que Moisés golpea la roca",
+    caption: "Moisés golpea la roca",
+    frame: "col-span-1 md:col-span-5",
+    ratio: "aspect-[4/3]",
+  },
+  {
+    src: itza("exterior-vista-itza-11.jpeg"),
+    alt: "Estatua de venado de bronce junto a la fuente, mirando al volcán",
+    caption: "El venado",
+    frame: "col-span-2 md:col-span-4 md:row-span-2",
+    ratio: "aspect-[3/4]",
+  },
+  {
+    src: casa("exterior-vista-casa-13.jpeg"),
+    alt: "Placa de piedra con la cita del ancla y la fe en Cristo resucitado",
+    caption: "La placa del ancla",
+    frame: "col-span-1 md:col-span-4",
+    ratio: "aspect-square",
   },
   {
     src: casa("exterior-vista-casa-12.jpeg"),
     alt: "San Francisco sentado en piedra junto a la paloma, con el bosque al fondo",
+    caption: "San Francisco en piedra",
+    frame: "col-span-1 md:col-span-4",
+    ratio: "aspect-square",
+  },
+  {
+    src: itza("exterior-vista-itza-01.jpeg"),
+    alt: "Vista del volcán nevado entre la roca y los pinos de la propiedad",
+    caption: "Vista al Itza",
+    frame: "col-span-2 md:col-span-12",
+    ratio: "aspect-[16/7]",
   },
 ];
+
+export const generalGallery: SitePhoto[] = lifeGallery.map(({ src, alt }) => ({ src, alt }));
 
 export const instalacionesGallery: SitePhoto[] = [
   {
     src: casa("exterior-vista-casa-05.jpeg"),
-    alt: "Fachada de piedra de la capilla con arco Silentium tibi laus y campanario",
+    alt: "Fachada de piedra de la capilla con el arco Silentium tibi laus",
   },
   {
     src: casa("exterior-vista-casa-06.jpeg"),
-    alt: "Torre de piedra con techo de teja y vista al bosque desde la azotea",
+    alt: "Torre de piedra con techo de teja y vista al bosque",
   },
   {
     src: casa("exterior-vista-casa-07.jpeg"),
@@ -75,15 +134,15 @@ export const instalacionesGallery: SitePhoto[] = [
   },
   {
     src: casa("exterior-vista-casa-04.jpeg"),
-    alt: "Escalinata de piedra con arcos y vegetación cubierta de musgo",
+    alt: "Escalinata de piedra con arcos y vegetación",
   },
   {
     src: casa("exterior-vista-casa-09.jpeg"),
-    alt: "Cruz de piedra tallada, ángel de bronce y arco Pax vobis en un día nublado",
+    alt: "Cruz de piedra, ángel de bronce y arco Pax vobis",
   },
   {
     src: casa("exterior-vista-casa-08.jpeg"),
-    alt: "Estatua blanca y vitral circular, vistos desde abajo entre la vegetación",
+    alt: "Escultura blanca y vitral circular entre la vegetación",
   },
   {
     src: casa("exterior-vista-casa-10.jpeg"),
@@ -94,15 +153,15 @@ export const instalacionesGallery: SitePhoto[] = [
 export const surroundingsPhotos: SitePhoto[] = [
   {
     src: itza("exterior-vista-itza-09.jpeg"),
-    alt: "Volcán entre pinos con una cruz de metal en primer plano y cielo nublado",
+    alt: "Volcán entre pinos con una cruz de metal en primer plano",
   },
   {
     src: itza("exterior-vista-itza-01.jpeg"),
-    alt: "Volcán nevado entre pinos densos bajo un cielo despejado",
+    alt: "Volcán nevado entre pinos densos",
   },
   {
     src: itza("exterior-vista-itza-08.jpeg"),
-    alt: "Valle boscoso amplio con el volcán humeante al fondo",
+    alt: "Valle boscoso amplio con el volcán al fondo",
   },
 ];
 

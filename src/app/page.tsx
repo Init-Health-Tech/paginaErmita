@@ -1,25 +1,32 @@
-import { ArtisanDetails } from "@/components/home/ArtisanDetails";
-import { FeaturedBanner } from "@/components/home/FeaturedBanner";
 import { FinalCta } from "@/components/home/FinalCta";
 import { Hero } from "@/components/home/Hero";
 import { LifeAtErmita } from "@/components/home/LifeAtErmita";
-import { QuickAccessCards } from "@/components/home/QuickAccessCards";
+import { Presentation } from "@/components/home/Presentation";
 import { QuoteSection } from "@/components/home/QuoteSection";
-import { Surroundings } from "@/components/home/Surroundings";
+import { Reveal } from "@/components/Reveal";
 import { Testimonials } from "@/components/home/Testimonials";
+import { ThreePaths } from "@/components/home/ThreePaths";
+import { VisualPause } from "@/components/home/VisualPause";
 
 export default function HomePage() {
   return (
-    <div className="mx-auto max-w-6xl px-4 pb-16 pt-12 sm:px-6 sm:pb-20 sm:pt-16 md:py-24">
+    <>
       <Hero />
-      <QuickAccessCards />
-      <FeaturedBanner />
-      <LifeAtErmita />
-      <Surroundings />
-      <Testimonials />
-      <ArtisanDetails />
+      <Reveal>
+        <Presentation />
+      </Reveal>
+      <Reveal>
+        <ThreePaths />
+      </Reveal>
+      <Reveal>
+        <LifeAtErmita />
+      </Reveal>
+      <VisualPause />
+      <Reveal>
+        <Testimonials />
+      </Reveal>
       <QuoteSection />
       <FinalCta />
-    </div>
+    </>
   );
 }

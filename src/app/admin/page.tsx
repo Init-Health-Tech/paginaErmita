@@ -1,8 +1,13 @@
 import type { Metadata } from "next";
 import { AdminLoginForm } from "@/components/AdminLoginForm";
+import { DailyStats } from "@/components/admin/DailyStats";
+import { SubmissionsTable } from "@/components/admin/SubmissionsTable";
+import { toAdminTableRow } from "@/lib/adminRows";
 import { isAdminAuthenticated } from "@/lib/adminAuth";
 import { getGuardAccessPath } from "@/lib/guardAccess";
 import { getDailyVisitStats, listSubmissions } from "@/lib/submissions";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Panel administrador",
@@ -29,7 +34,8 @@ export default async function AdminPage() {
     );
   }
 
-  const rows = await listSubmissions();
+  const submissions = await listSubmissions();
+  const rows = submissions.map(toAdminTableRow);
   const stats = await getDailyVisitStats(14);
   const visitsToday = stats.at(-1)?.visits ?? 0;
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "";
@@ -67,54 +73,8 @@ export default async function AdminPage() {
         </div>
       </header>
 
-      <section className="mt-6 surface rounded-sm p-4 sm:mt-8 sm:p-6">
-        <h2 className="text-lg font-semibold text-[var(--color-ermita-ink)]">Estadisticas diarias (ultimos 14 dias)</h2>
-        <div className="mt-4 grid grid-cols-2 gap-2 text-sm sm:grid-cols-4 lg:grid-cols-7">
-          {stats.map((item) => (
-            <div key={item.date} className="rounded-sm border border-[var(--color-ermita-line)] bg-white px-3 py-2">
-              <p className="text-xs text-[var(--color-ermita-muted)]">{item.date}</p>
-              <p className="mt-1 text-xl text-[var(--color-ermita-brown)]">{item.visits}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="mt-8 surface rounded-sm p-0">
-        <div className="overflow-x-auto">
-          <table className="min-w-full text-left text-sm">
-            <thead className="border-b border-[var(--color-ermita-line)] bg-[var(--color-ermita-brown-soft)]">
-              <tr>
-                <th className="px-4 py-3 font-medium">Fecha</th>
-                <th className="px-4 py-3 font-medium">Tipo</th>
-                <th className="px-4 py-3 font-medium">Nombre</th>
-                <th className="px-4 py-3 font-medium">Email</th>
-                <th className="px-4 py-3 font-medium">Estado</th>
-                <th className="px-4 py-3 font-medium">ID</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((row) => {
-                const nombre = String(row.payload.nombre ?? "-");
-                const email = String(row.payload.email ?? "-");
-                const visitDate = row.type === "visitas" ? String(row.payload.fecha_preferida ?? "") : "";
-                return (
-                  <tr key={row.id} className="border-b border-[var(--color-ermita-line)]/70">
-                    <td className="px-4 py-3 text-[var(--color-ermita-muted)]">
-                      {new Date(row.createdAt).toLocaleString("es-MX")}
-                      {visitDate ? <span className="mt-1 block text-xs">Visita: {visitDate}</span> : null}
-                    </td>
-                    <td className="px-4 py-3 capitalize">{row.type}</td>
-                    <td className="px-4 py-3">{nombre}</td>
-                    <td className="px-4 py-3">{email}</td>
-                    <td className="px-4 py-3 capitalize">{row.status ?? "—"}</td>
-                    <td className="px-4 py-3 font-mono text-xs">{row.id}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </section>
+      <DailyStats stats={stats} />
+      <SubmissionsTable rows={rows} mode="all" />
     </div>
   );
 }
