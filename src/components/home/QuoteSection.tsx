@@ -9,7 +9,7 @@ export function QuoteSection() {
       <div className="relative flex min-h-[70vh] items-center justify-center px-6 py-20 text-center text-[var(--color-on-dark)]">
         <figure className="max-w-[40ch]">
           <blockquote className="quote-lg">
-            «El Señor me dio la gracia de comenzar en la conversión; que Él me dé la gracia de perseverar hasta el fin.»
+            «El hombre es tan solo lo que es ante los ojos de Dios, y nada más.»
           </blockquote>
           <figcaption className="eyebrow mt-8 text-[var(--color-on-dark)]">— San Francisco de Asís</figcaption>
         </figure>
