@@ -296,10 +296,10 @@
 
 .reveal {
   opacity: 0;
-  transform: translateY(12px);
+  transform: translateY(18px);
   transition:
-    opacity 600ms ease-out,
-    transform 600ms ease-out;
+    opacity 700ms ease-out,
+    transform 700ms ease-out;
 }
 
 .reveal-in {

@@ -5,9 +5,11 @@ import { useEffect, useRef, useState } from "react";
 export function Reveal({
   children,
   className = "",
+  delay = 0,
 }: {
   children: React.ReactNode;
   className?: string;
+  delay?: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [hidden, setHidden] = useState(false);
@@ -40,7 +42,11 @@ export function Reveal({
   }, []);
 
   return (
-    <div ref={ref} className={`${hidden ? "reveal" : ""} ${visible ? "reveal-in" : ""} ${className}`}>
+    <div
+      ref={ref}
+      className={`${hidden ? "reveal" : ""} ${visible ? "reveal-in" : ""} ${className}`}
+      style={delay ? { transitionDelay: visible ? `${delay}ms` : undefined } : undefined}
+    >
       {children}
     </div>
   );
