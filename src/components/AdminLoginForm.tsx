@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { adminInputClass, adminPrimaryButtonClass } from "@/components/admin/styles";
 
 export function AdminLoginForm() {
   const [loading, setLoading] = useState(false);
@@ -24,7 +25,7 @@ export function AdminLoginForm() {
       if (!res.ok) throw new Error(json.error ?? "Error");
       window.location.reload();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "No se pudo iniciar sesion.");
+      setError(e instanceof Error ? e.message : "No se pudo iniciar sesión.");
     } finally {
       setLoading(false);
     }
@@ -33,7 +34,7 @@ export function AdminLoginForm() {
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       <div>
-        <label htmlFor="admin-password" className="block text-sm font-medium">
+        <label htmlFor="admin-password" className="block text-sm text-[var(--color-text)]">
           Clave de administrador
         </label>
         <input
@@ -41,14 +42,14 @@ export function AdminLoginForm() {
           name="password"
           type="password"
           required
-          className="mt-1 w-full min-h-11 rounded-sm border border-[var(--color-ermita-line)] bg-white px-3 py-2.5 text-base focus:border-[var(--color-ermita-brown)] focus:outline-none focus:ring-2 focus:ring-[var(--color-ermita-gold)]/35 focus:ring-offset-2 sm:text-sm"
+          className={adminInputClass}
         />
       </div>
-      {error ? <p className="text-sm text-red-800">{error}</p> : null}
+      {error ? <p className="text-sm text-[#8f5348]">{error}</p> : null}
       <button
         type="submit"
         disabled={loading}
-        className="w-full min-h-11 rounded-sm border border-[var(--color-ermita-brown)] bg-[var(--color-ermita-brown)] px-5 py-2.5 text-sm text-white transition hover:opacity-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-ermita-gold)]/45 focus-visible:ring-offset-2 disabled:opacity-60 sm:w-auto"
+        className={`${adminPrimaryButtonClass} w-full sm:w-auto`}
       >
         {loading ? "Ingresando..." : "Entrar al panel"}
       </button>
