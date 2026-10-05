@@ -12,7 +12,7 @@ export function FinalCta() {
           <Link href="/retiros" className="btn-inverted">
             Próximos retiros
           </Link>
-          <Link href="/visitas" className="link-arrow link-on-dark">
+          <Link href="/visitas/registro" target="_blank" rel="noopener noreferrer" className="link-arrow link-on-dark">
             Registrar visita
             <span className="arrow" aria-hidden>
               →

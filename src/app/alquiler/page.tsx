@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Amenidades } from "@/components/Amenidades";
-import { FormAlquiler } from "@/components/FormAlquiler";
 import { PageGallery } from "@/components/PageGallery";
 import { PageHero } from "@/components/PageHero";
 import { Reveal } from "@/components/Reveal";
@@ -39,7 +39,7 @@ export default async function AlquilerPage() {
         lead="Un espacio para que su grupo se retire a orar, en un clima de recogimiento franciscano."
         src={pageHeroes.alquiler.src}
         alt={pageHeroes.alquiler.alt}
-        cta={{ href: "#formulario-alquiler", label: "Solicitar alquiler" }}
+        cta={{ href: "/alquiler/solicitud", label: "Solicitar alquiler", newTab: true }}
       />
 
       <section className="band-bg section-pad">
@@ -114,20 +114,18 @@ export default async function AlquilerPage() {
         </div>
       </section>
 
-      <section id="formulario-alquiler" className="band-bg section-pad scroll-mt-28">
+      <section className="band-bg section-pad">
         <div className="shell">
-          <div className="grid gap-10 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-16">
-            <Reveal>
-              <p className="eyebrow">Solicitud</p>
-              <h2 className="heading-2 mt-4 max-w-[12ch]">Formulario de solicitud</h2>
-              <p className="mt-5 max-w-[36ch] text-[var(--color-muted)]">
-                Cuéntenos sobre su grupo y las fechas deseadas. Le responderemos para confirmar disponibilidad.
-              </p>
-            </Reveal>
-            <Reveal delay={100}>
-              <FormAlquiler />
-            </Reveal>
-          </div>
+          <Reveal>
+            <p className="eyebrow">Solicitud</p>
+            <h2 className="heading-2 mt-4 max-w-[14ch]">Solicitar alquiler</h2>
+            <p className="mt-5 max-w-[40ch] text-[var(--color-muted)]">
+              Cuéntenos sobre su grupo y las fechas deseadas. Le responderemos para confirmar disponibilidad.
+            </p>
+            <Link href="/alquiler/solicitud" target="_blank" rel="noopener noreferrer" className="btn-primary mt-8">
+              Solicitar alquiler
+            </Link>
+          </Reveal>
         </div>
       </section>
     </>

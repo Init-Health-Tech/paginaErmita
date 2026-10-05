@@ -20,7 +20,7 @@ export async function ProximosRetiros() {
       {retreats.length === 0 ? (
         <Reveal>
           <p className="mt-10 border-t border-[var(--color-line)] pt-8 text-[var(--color-muted)]">
-            Por ahora no hay retiros programados. Puede dejar sus datos más abajo para enterarse de las próximas convocatorias.
+            Por ahora no hay retiros programados. Puede dejar sus datos para enterarse de las próximas convocatorias.
           </p>
         </Reveal>
       ) : (
@@ -46,7 +46,9 @@ export async function ProximosRetiros() {
                     ) : null}
                   </div>
                   <Link
-                    href={`/retiros?retiro=${retiro.id}#formulario-retiro`}
+                    href={`/retiros/inscripcion?retiro=${encodeURIComponent(retiro.id)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="link-arrow w-fit transition-transform duration-300 group-hover:translate-x-1"
                   >
                     Inscribirme

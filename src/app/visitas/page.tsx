@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Amenidades } from "@/components/Amenidades";
-import { FormVisitas } from "@/components/FormVisitas";
 import { PageGallery } from "@/components/PageGallery";
 import { PageHero } from "@/components/PageHero";
 import { Reveal } from "@/components/Reveal";
@@ -28,7 +28,7 @@ export default function VisitasPage() {
         lead="Un espacio de oración abierto a quienes están en la zona, con registro previo para cuidar el silencio."
         src={pageHeroes.visitas.src}
         alt={pageHeroes.visitas.alt}
-        cta={{ href: "#formulario-visita", label: "Registrar visita" }}
+        cta={{ href: "/visitas/registro", label: "Registrar mi visita", newTab: true }}
       />
 
       <section className="band-bg section-pad">
@@ -72,20 +72,18 @@ export default function VisitasPage() {
         </div>
       </section>
 
-      <section id="formulario-visita" className="band-sage section-pad scroll-mt-28">
+      <section className="band-sage section-pad">
         <div className="shell">
-          <div className="grid gap-10 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-16">
-            <Reveal>
-              <p className="eyebrow">Registro</p>
-              <h2 className="heading-2 mt-4 max-w-[12ch]">Registro de visita</h2>
-              <p className="mt-5 max-w-[36ch] text-[var(--color-muted)]">
-                Indique fecha y datos de contacto. Tras confirmar, recibirá un código QR para presentar al llegar.
-              </p>
-            </Reveal>
-            <Reveal delay={100}>
-              <FormVisitas />
-            </Reveal>
-          </div>
+          <Reveal>
+            <p className="eyebrow">Registro</p>
+            <h2 className="heading-2 mt-4 max-w-[14ch]">Registrar mi visita</h2>
+            <p className="mt-5 max-w-[40ch] text-[var(--color-muted)]">
+              Indique fecha y datos de contacto. Tras confirmar, recibirá un código QR para presentar al llegar.
+            </p>
+            <Link href="/visitas/registro" target="_blank" rel="noopener noreferrer" className="btn-primary mt-8">
+              Registrar mi visita
+            </Link>
+          </Reveal>
         </div>
       </section>
     </>

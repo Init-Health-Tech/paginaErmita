@@ -14,9 +14,14 @@ export function SiteChrome({
   const pathname = usePathname();
   if (pathname.startsWith("/admin")) return children;
 
+  const isFormPage =
+    pathname === "/alquiler/solicitud" ||
+    pathname === "/retiros/inscripcion" ||
+    pathname === "/visitas/registro";
+
   return (
     <>
-      <SiteHeader isAdmin={isAdmin} />
+      {isFormPage ? null : <SiteHeader isAdmin={isAdmin} />}
       <main className="relative flex-1">{children}</main>
       <SiteFooter isAdmin={isAdmin} />
     </>

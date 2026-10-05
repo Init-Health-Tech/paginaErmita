@@ -9,6 +9,7 @@ const paths = [
     text: "Renta del espacio completo para parroquias, movimientos y comunidades. La casa ofrece capilla, comedor y cuartos para un tiempo de oración en silencio.",
     href: "/alquiler",
     link: "Conocer más",
+    newTab: false,
     photo: pathPhotos.alquiler,
   },
   {
@@ -17,14 +18,16 @@ const paths = [
     text: "Retiros organizados por la Ermita en distintas fechas, vividos en un clima de recogimiento y escucha de la Palabra.",
     href: "/retiros",
     link: "Ver próximos retiros",
+    newTab: false,
     photo: pathPhotos.retiros,
   },
   {
     eyebrow: "03 — Visitas",
     title: "Ven a conocer la Ermita",
     text: "Para quienes están en la zona. El registro se hace con un día de anticipación, para cuidar el silencio de la casa y el acceso.",
-    href: "/visitas",
+    href: "/visitas/registro",
     link: "Registrar visita",
+    newTab: true,
     photo: pathPhotos.visitas,
   },
 ];
@@ -46,7 +49,12 @@ export function ThreePaths() {
                 <p className="eyebrow">{item.eyebrow}</p>
                 <h3 className="heading-3 mt-4">{item.title}</h3>
                 <p className="mt-4 text-[var(--color-muted)]">{item.text}</p>
-                <Link href={item.href} className="link-arrow mt-6">
+                <Link
+                  href={item.href}
+                  className="link-arrow mt-6"
+                  target={item.newTab ? "_blank" : undefined}
+                  rel={item.newTab ? "noopener noreferrer" : undefined}
+                >
                   {item.link}
                   <span className="arrow" aria-hidden>
                     →

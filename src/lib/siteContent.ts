@@ -37,8 +37,11 @@ export async function writeSiteContent(content: SiteContent): Promise<SiteConten
   await mkdir(DATA_DIR, { recursive: true });
   await writeFile(DATA_FILE, JSON.stringify(safe, null, 2), "utf-8");
   revalidatePath("/alquiler");
+  revalidatePath("/alquiler/solicitud");
   revalidatePath("/retiros");
+  revalidatePath("/retiros/inscripcion");
   revalidatePath("/visitas");
+  revalidatePath("/visitas/registro");
   revalidatePath("/admin");
   revalidatePath("/admin/alquiler");
   revalidatePath("/admin/retiros");

@@ -199,7 +199,7 @@ export function SiteHeader({ isAdmin = false }: { isAdmin?: boolean }) {
               </span>
             );
           })}
-          <Link href="/visitas" className="btn-primary">
+          <Link href="/visitas/registro" target="_blank" rel="noopener noreferrer" className="btn-primary">
             Registrar visita
           </Link>
         </nav>
@@ -216,7 +216,7 @@ export function SiteHeader({ isAdmin = false }: { isAdmin?: boolean }) {
               </li>
             ))}
           </ul>
-          <Link href="/visitas" className="btn-primary w-full" onClick={() => setOpen(false)}>
+          <Link href="/visitas/registro" target="_blank" rel="noopener noreferrer" className="btn-primary w-full" onClick={() => setOpen(false)}>
             Registrar visita
           </Link>
         </nav>

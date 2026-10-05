@@ -14,7 +14,7 @@ export function PageHero({
   lead?: string;
   src: string;
   alt: string;
-  cta?: { href: string; label: string };
+  cta?: { href: string; label: string; newTab?: boolean };
 }) {
   return (
     <section className="relative h-[68vh] min-h-[26rem] overflow-hidden md:h-[78vh] md:min-h-[32rem]">
@@ -27,7 +27,12 @@ export function PageHero({
           {lead ? <p className="mt-5 max-w-[38ch] text-[1.125rem] leading-relaxed text-[color-mix(in_srgb,var(--color-on-dark)_88%,transparent)]">{lead}</p> : null}
           {cta ? (
             <div className="mt-8">
-              <Link href={cta.href} className="btn-primary">
+              <Link
+                href={cta.href}
+                className="btn-primary"
+                target={cta.newTab ? "_blank" : undefined}
+                rel={cta.newTab ? "noopener noreferrer" : undefined}
+              >
                 {cta.label}
               </Link>
             </div>

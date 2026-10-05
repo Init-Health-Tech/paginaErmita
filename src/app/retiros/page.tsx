@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { FormRetiros } from "@/components/FormRetiros";
+import Link from "next/link";
 import { PageGallery } from "@/components/PageGallery";
 import { PageHero } from "@/components/PageHero";
 import { ProximosRetiros } from "@/components/ProximosRetiros";
@@ -13,19 +13,13 @@ export const metadata: Metadata = {
   description: "Información y convocatorias de retiros espirituales en la Ermita del Silencio.",
 };
 
-type Props = {
-  searchParams: Promise<{ retiro?: string }>;
-};
-
 const moments = [
   { title: "Recogimiento", text: "Un clima de silencio que favorece la escucha interior." },
   { title: "Palabra", text: "Oración, liturgia y tiempos de meditación a lo largo del día." },
   { title: "Comunidad", text: "Convocatorias abiertas a quienes buscan retirarse con otros." },
 ];
 
-export default async function RetirosPage({ searchParams }: Props) {
-  const { retiro = "" } = await searchParams;
-
+export default function RetirosPage() {
   return (
     <>
       <PageHero
@@ -34,7 +28,7 @@ export default async function RetirosPage({ searchParams }: Props) {
         lead="Convocatorias de silencio, oración y escucha de la Palabra, en la casa de la Ermita."
         src={pageHeroes.retiros.src}
         alt={pageHeroes.retiros.alt}
-        cta={{ href: "#formulario-retiro", label: "Solicitar información" }}
+        cta={{ href: "/retiros/inscripcion", label: "Inscribirme a un retiro", newTab: true }}
       />
 
       <section className="band-bg section-pad">
@@ -74,20 +68,18 @@ export default async function RetirosPage({ searchParams }: Props) {
         </div>
       </section>
 
-      <section id="formulario-retiro" className="band-sage section-pad scroll-mt-28">
+      <section className="band-sage section-pad">
         <div className="shell">
-          <div className="grid gap-10 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-16">
-            <Reveal>
-              <p className="eyebrow">Inscripción</p>
-              <h2 className="heading-2 mt-4 max-w-[14ch]">Solicitar información</h2>
-              <p className="mt-5 max-w-[36ch] text-[var(--color-muted)]">
-                Indique el retiro de su interés o deje sus datos para enterarse de próximas fechas.
-              </p>
-            </Reveal>
-            <Reveal delay={100}>
-              <FormRetiros key={retiro} initialRetiro={retiro} />
-            </Reveal>
-          </div>
+          <Reveal>
+            <p className="eyebrow">Inscripción</p>
+            <h2 className="heading-2 mt-4 max-w-[16ch]">Inscribirme a un retiro</h2>
+            <p className="mt-5 max-w-[40ch] text-[var(--color-muted)]">
+              Indique el retiro de su interés o deje sus datos para enterarse de próximas fechas.
+            </p>
+            <Link href="/retiros/inscripcion" target="_blank" rel="noopener noreferrer" className="btn-primary mt-8">
+              Inscribirme a un retiro
+            </Link>
+          </Reveal>
         </div>
       </section>
     </>
