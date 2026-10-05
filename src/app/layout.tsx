@@ -1,8 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, Inter } from "next/font/google";
 import "./globals.css";
-import { SiteFooter } from "@/components/SiteFooter";
-import { SiteHeader } from "@/components/SiteHeader";
+import { SiteChrome } from "@/components/SiteChrome";
 import { isAdminAuthenticated } from "@/lib/adminAuth";
 
 const cormorant = Cormorant_Garamond({
@@ -46,9 +45,7 @@ export default async function RootLayout({
   return (
     <html lang="es" className={`${cormorant.variable} ${inter.variable}`}>
       <body className="flex min-h-dvh min-h-screen flex-col">
-        <SiteHeader isAdmin={isAdmin} />
-        <main className="relative flex-1">{children}</main>
-        <SiteFooter isAdmin={isAdmin} />
+        <SiteChrome isAdmin={isAdmin}>{children}</SiteChrome>
       </body>
     </html>
   );

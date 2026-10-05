@@ -68,6 +68,42 @@ export function expandDateRange(start: string, end: string): string[] {
   return dates;
 }
 
+const ADMIN_MONTHS = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+
+function adminDateLabel(day: number, month: number, year: number, time?: string): string {
+  if (!Number.isInteger(day) || !Number.isInteger(month) || !Number.isInteger(year)) return "";
+  if (month < 1 || month > 12 || day < 1 || day > 31) return "";
+  const label = `${day} ${ADMIN_MONTHS[month - 1]} ${year}`;
+  return time ? `${label} · ${time}` : label;
+}
+
+export function formatAdminDate(value: string | Date): string {
+  if (typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value.trim())) {
+    const [year, month, day] = value.trim().split("-").map(Number);
+    return adminDateLabel(day, month, year) || value;
+  }
+
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) return typeof value === "string" ? value : "";
+
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: MEXICO_TZ,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  }).formatToParts(date);
+  const pick = (type: Intl.DateTimeFormatPartTypes) => parts.find((part) => part.type === type)?.value ?? "";
+  const day = Number(pick("day"));
+  const month = Number(pick("month"));
+  const year = Number(pick("year"));
+  const hour = pick("hour").replace(/\D/g, "").padStart(2, "0");
+  const minute = pick("minute").replace(/\D/g, "").padStart(2, "0");
+  return adminDateLabel(day, month, year, `${hour}:${minute}`) || (typeof value === "string" ? value : "");
+}
+
 export function extractDatesFromText(text: string): string[] {
   const dates = new Set<string>();
   const ranges: Array<[string, string]> = [];
