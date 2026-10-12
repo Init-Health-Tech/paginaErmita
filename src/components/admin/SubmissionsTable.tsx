@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import { Check, Copy } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Check, Copy, Trash2 } from "lucide-react";
 import type { AdminTableRow } from "@/lib/adminRows";
-import { formatAdminDate } from "@/lib/dates";
+import { formatAdminDate, isoDateInTimeZone, MEXICO_TZ } from "@/lib/dates";
 import styles from "./admin.module.css";
-import { adminInlineLinkClass, adminSecondaryButtonClass, adminSectionTitleClass } from "./styles";
+import { adminInlineLinkClass, adminInputClass, adminSecondaryButtonClass, adminSectionTitleClass } from "./styles";
 
 export type SubmissionTableMode = "all" | "alquiler" | "retiros" | "visitas";
 
@@ -41,6 +42,33 @@ function when(value: string): string {
   return formatAdminDate(value) || "—";
 }
 
+const STATUS_FILTERS = [
+  { value: "", label: "Todos" },
+  { value: "confirmado", label: "Confirmado" },
+  { value: "pendiente", label: "Pendiente" },
+  { value: "bloqueo", label: "Bloqueo" },
+  { value: "sin-estado", label: "Sin estado" },
+];
+
+const filterLabelClass = "block font-sans text-[13px] leading-5 text-[var(--color-text)]";
+
+function recordDay(createdAt: string): string {
+  const date = new Date(createdAt);
+  if (Number.isNaN(date.getTime())) return createdAt.slice(0, 10);
+  return isoDateInTimeZone(date, MEXICO_TZ);
+}
+
+function matchesFilters(row: AdminTableRow, query: string, from: string, to: string, status: string): boolean {
+  const needle = query.trim().toLowerCase();
+  if (needle && !`${row.nombre} ${row.email}`.toLowerCase().includes(needle)) return false;
+  const day = recordDay(row.createdAt);
+  if (from && day < from) return false;
+  if (to && day > to) return false;
+  if (status === "sin-estado") return !row.status.trim();
+  if (status && row.status.trim().toLowerCase() !== status) return false;
+  return true;
+}
+
 function StatusMark({ status }: { status: string }) {
   const key = status.trim().toLowerCase();
   if (!key) return <span className="text-[var(--color-muted)]">—</span>;
@@ -57,6 +85,22 @@ function StatusMark({ status }: { status: string }) {
       <span className="inline-block h-1.5 w-1.5 shrink-0 rounded-full" style={{ backgroundColor: item.color }} aria-hidden />
       {item.label}
     </span>
+  );
+}
+
+function DeleteCell({ row, pending, onRemove }: { row: AdminTableRow; pending: boolean; onRemove: () => void }) {
+  return (
+    <td>
+      <button
+        type="button"
+        className="inline-flex h-9 w-9 items-center justify-center bg-transparent text-[#8f5348] disabled:opacity-40"
+        aria-label={`Eliminar registro de ${row.nombre}`}
+        disabled={pending}
+        onClick={onRemove}
+      >
+        <Trash2 strokeWidth={1.5} className="h-4 w-4" />
+      </button>
+    </td>
   );
 }
 
@@ -108,6 +152,7 @@ export function SubmissionsTable({
   emptyLabel,
   beforeTable,
   className = "",
+  manage = false,
 }: {
   title: string;
   rows: AdminTableRow[];
@@ -117,38 +162,142 @@ export function SubmissionsTable({
   emptyLabel?: string;
   beforeTable?: React.ReactNode;
   className?: string;
+  manage?: boolean;
 }) {
-  const headers = headersFor(mode);
+  const router = useRouter();
+  const [items, setItems] = useState(rows);
+  const [query, setQuery] = useState("");
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState("");
+  const [status, setStatus] = useState("");
+  const [pendingId, setPendingId] = useState<string | null>(null);
+  const [actionError, setActionError] = useState("");
+  const rowIds = rows.map((row) => row.id).join("|");
+
+  useEffect(() => {
+    setItems(rows);
+  }, [rowIds, rows]);
+
+  const filtered = useMemo(
+    () => items.filter((row) => matchesFilters(row, query, from, to, status)),
+    [items, query, from, to, status]
+  );
+  const filtering = Boolean(query.trim() || from || to || status);
+  const headers = [...headersFor(mode), ...(manage ? ["acciones"] : [])];
   const showVisit = mode === "visitas" || mode === "all";
+
+  async function remove(row: AdminTableRow) {
+    const who = row.nombre.trim() && row.nombre !== "—" ? row.nombre : "este registro";
+    if (!window.confirm(`¿Eliminar el registro de ${who}? Esta acción no se puede deshacer.`)) return;
+    setActionError("");
+    setPendingId(row.id);
+    try {
+      const response = await fetch("/api/admin/submissions", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: row.id }),
+      });
+      const data = (await response.json().catch(() => null)) as { error?: string } | null;
+      if (!response.ok) throw new Error(data?.error ?? "No se pudo eliminar.");
+      setItems((current) => current.filter((item) => item.id !== row.id));
+      router.refresh();
+    } catch (reason) {
+      setActionError(reason instanceof Error ? reason.message : "No se pudo eliminar.");
+    } finally {
+      setPendingId(null);
+    }
+  }
 
   return (
     <section className={`min-w-0 ${className}`}>
       <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
         <div className="flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-1">
           <h2 className={adminSectionTitleClass}>{title}</h2>
-          <p className="text-sm text-[var(--color-muted)]">{countPhrase(mode, rows.length)}</p>
+          <p className="text-sm text-[var(--color-muted)]">
+            {filtering ? `${filtered.length} de ${countPhrase(mode, items.length)}` : countPhrase(mode, items.length)}
+          </p>
         </div>
         <a href={csvHref} className={adminSecondaryButtonClass}>
           Descargar CSV
         </a>
       </div>
       {beforeTable ? <div className="mt-8">{beforeTable}</div> : null}
-      {rows.length === 0 ? (
+      {manage && (items.length > 0 || filtering) ? (
+        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="min-w-0">
+            <label htmlFor={`${mode}-buscar`} className={filterLabelClass}>
+              Nombre o correo
+            </label>
+            <input
+              id={`${mode}-buscar`}
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              className={adminInputClass}
+            />
+          </div>
+          <div className="min-w-0">
+            <label htmlFor={`${mode}-desde`} className={filterLabelClass}>
+              Desde
+            </label>
+            <input id={`${mode}-desde`} type="date" value={from} onChange={(event) => setFrom(event.target.value)} className={adminInputClass} />
+          </div>
+          <div className="min-w-0">
+            <label htmlFor={`${mode}-hasta`} className={filterLabelClass}>
+              Hasta
+            </label>
+            <input id={`${mode}-hasta`} type="date" value={to} onChange={(event) => setTo(event.target.value)} className={adminInputClass} />
+          </div>
+          <div className="min-w-0">
+            <label htmlFor={`${mode}-estado`} className={filterLabelClass}>
+              Estado
+            </label>
+            <select id={`${mode}-estado`} value={status} onChange={(event) => setStatus(event.target.value)} className={adminInputClass}>
+              {STATUS_FILTERS.map((option) => (
+                <option key={option.value || "todos"} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          {filtering ? (
+            <button
+              type="button"
+              className="justify-self-start bg-transparent text-sm text-[var(--color-muted)] underline-offset-4 hover:underline"
+              onClick={() => {
+                setQuery("");
+                setFrom("");
+                setTo("");
+                setStatus("");
+              }}
+            >
+              Limpiar filtro
+            </button>
+          ) : null}
+        </div>
+      ) : null}
+      {actionError ? (
+        <p className="mt-4 text-sm text-[#8f5348]" role="alert">
+          {actionError}
+        </p>
+      ) : null}
+      {items.length === 0 ? (
         <p className="px-4 py-16 text-center text-sm text-[var(--color-muted)]">{emptyLabel ?? EMPTY_LABEL[mode]}</p>
+      ) : filtered.length === 0 ? (
+        <p className="px-4 py-16 text-center text-sm text-[var(--color-muted)]">Ningún registro coincide con el filtro.</p>
       ) : (
         <div className={`${styles.scroll} mt-8`}>
           <table className={styles.table}>
             <thead>
               <tr>
                 {headers.map((header) => (
-                  <th key={header} scope="col">
-                    {header}
+                  <th key={header || "acciones"} scope="col">
+                    {header === "acciones" ? <span className="sr-only">Eliminar</span> : header}
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {rows.map((row) => (
+              {filtered.map((row) => (
                 <tr key={row.id}>
                   {mode === "visitas" ? (
                     <>
@@ -180,6 +329,7 @@ export function SubmissionsTable({
                       <td>
                         <CopyId id={row.id} />
                       </td>
+                      {manage ? <DeleteCell row={row} pending={pendingId === row.id} onRemove={() => remove(row)} /> : null}
                     </>
                   ) : mode === "retiros" ? (
                     <>
@@ -193,6 +343,7 @@ export function SubmissionsTable({
                       <td>
                         <CopyId id={row.id} />
                       </td>
+                      {manage ? <DeleteCell row={row} pending={pendingId === row.id} onRemove={() => remove(row)} /> : null}
                     </>
                   ) : mode === "alquiler" ? (
                     <>
@@ -205,6 +356,7 @@ export function SubmissionsTable({
                       <td>
                         <CopyId id={row.id} />
                       </td>
+                      {manage ? <DeleteCell row={row} pending={pendingId === row.id} onRemove={() => remove(row)} /> : null}
                     </>
                   ) : (
                     <>
@@ -218,6 +370,7 @@ export function SubmissionsTable({
                       <td>
                         <CopyId id={row.id} />
                       </td>
+                      {manage ? <DeleteCell row={row} pending={pendingId === row.id} onRemove={() => remove(row)} /> : null}
                     </>
                   )}
                 </tr>

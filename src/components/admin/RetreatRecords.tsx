@@ -25,6 +25,7 @@ export function RetreatRecords({
       mode="retiros"
       retreats={retreats}
       csvHref="/api/admin/submissions?format=csv&type=retiros"
+      manage
       beforeTable={
         <div className="w-full max-w-sm">
           <label htmlFor="filtro-retiro" className="block text-sm text-[var(--color-text)]">

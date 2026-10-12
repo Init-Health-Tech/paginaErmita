@@ -36,6 +36,7 @@ export default async function AdminAlquilerPage({
               rows={rows}
               mode="alquiler"
               csvHref="/api/admin/submissions?format=csv&type=alquiler"
+              manage
             />
           ),
         },

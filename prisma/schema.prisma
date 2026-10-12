@@ -1,0 +1,44 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum SubmissionType {
+  alquiler
+  retiros
+  visitas
+}
+
+enum VisitStatus {
+  confirmado
+  pendiente
+}
+
+model Submission {
+  id        String         @id
+  type      SubmissionType
+  createdAt DateTime       @default(now())
+  status    VisitStatus?
+  visitDate String?
+  visitTime String?
+  payload   Json
+  qrDataUrl String?        @db.Text
+  verifyUrl String?
+
+  @@index([type])
+  @@index([createdAt])
+  @@index([type, visitDate])
+}
+
+/// Una sola fila (id = "default"): costos, amenidades, retiros y formularios se leen y guardan juntos.
+model SiteContent {
+  id        String   @id
+  data      Json
+  updatedAt DateTime @updatedAt
+}

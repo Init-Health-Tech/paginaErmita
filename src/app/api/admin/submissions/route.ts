@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { isAdminAuthenticated } from "@/lib/adminAuth";
-import { getDailyVisitStats, listSubmissions, type SubmissionType } from "@/lib/submissions";
+import { deleteSubmission, getDailyVisitStats, listSubmissions, type SubmissionType } from "@/lib/submissions";
 
 const TYPES: SubmissionType[] = ["alquiler", "retiros", "visitas"];
 
@@ -41,4 +41,23 @@ export async function GET(request: Request) {
   }
 
   return NextResponse.json({ ok: true, rows, stats });
+}
+
+export async function DELETE(request: Request) {
+  if (!(await isAdminAuthenticated())) {
+    return NextResponse.json({ ok: false, error: "No autorizado" }, { status: 401 });
+  }
+
+  const body = (await request.json().catch(() => null)) as { id?: unknown } | null;
+  const id = typeof body?.id === "string" ? body.id.trim() : "";
+  if (!id) {
+    return NextResponse.json({ ok: false, error: "Falta el identificador" }, { status: 400 });
+  }
+
+  const removed = await deleteSubmission(id);
+  if (!removed) {
+    return NextResponse.json({ ok: false, error: "No se encontró el registro" }, { status: 404 });
+  }
+
+  return NextResponse.json({ ok: true });
 }

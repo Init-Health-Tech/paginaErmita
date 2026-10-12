@@ -1,30 +1,23 @@
-import { mkdir, readFile, writeFile } from "fs/promises";
-import path from "path";
 import { cache } from "react";
 import { revalidatePath, unstable_noStore as noStore } from "next/cache";
+import type { Prisma } from "@prisma/client";
 import {
   defaultSiteContent,
   sanitizeSiteContent,
   type FormSection,
   type SiteContent,
 } from "@/lib/contentModel";
+import { prisma } from "@/lib/db";
 
-const DATA_DIR = path.join(process.cwd(), "data");
-const DATA_FILE = path.join(DATA_DIR, "site-content.json");
+const SITE_CONTENT_ID = "default";
 
 async function readSiteContent(): Promise<SiteContent> {
   noStore();
-  await mkdir(DATA_DIR, { recursive: true });
   try {
-    const raw = await readFile(DATA_FILE, "utf-8");
-    return sanitizeSiteContent(JSON.parse(raw));
+    const row = await prisma.siteContent.findUnique({ where: { id: SITE_CONTENT_ID } });
+    if (!row) return defaultSiteContent();
+    return sanitizeSiteContent(row.data);
   } catch (error) {
-    const missing = typeof error === "object" && error !== null && "code" in error && error.code === "ENOENT";
-    if (missing) {
-      const defaults = defaultSiteContent();
-      await writeFile(DATA_FILE, JSON.stringify(defaults, null, 2), "utf-8");
-      return defaults;
-    }
     console.error("No se pudo leer la configuración del sitio", error);
     return defaultSiteContent();
   }
@@ -34,8 +27,12 @@ export const getSiteContent = cache(readSiteContent);
 
 export async function writeSiteContent(content: SiteContent): Promise<SiteContent> {
   const safe = sanitizeSiteContent(content);
-  await mkdir(DATA_DIR, { recursive: true });
-  await writeFile(DATA_FILE, JSON.stringify(safe, null, 2), "utf-8");
+  const data = JSON.parse(JSON.stringify(safe)) as Prisma.InputJsonValue;
+  await prisma.siteContent.upsert({
+    where: { id: SITE_CONTENT_ID },
+    create: { id: SITE_CONTENT_ID, data },
+    update: { data },
+  });
   revalidatePath("/alquiler");
   revalidatePath("/alquiler/solicitud");
   revalidatePath("/retiros");

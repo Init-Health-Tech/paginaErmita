@@ -1,5 +1,7 @@
-import { promises as fs } from "fs";
-import path from "path";
+import type { Prisma } from "@prisma/client";
+import { addDaysISO, isoDateInTimeZone, MEXICO_TZ, todayISO } from "@/lib/dates";
+import { prisma } from "@/lib/db";
+import { visitColumnsFromPayload } from "@/lib/visitColumns";
 
 export type SubmissionType = "alquiler" | "retiros" | "visitas";
 export type VisitStatus = "confirmado" | "pendiente";
@@ -14,18 +16,6 @@ export type SubmissionRecord = {
   status?: VisitStatus;
 };
 
-const DATA_DIR = path.join(process.cwd(), "data");
-const DATA_FILE = path.join(DATA_DIR, "submissions.json");
-
-async function ensureDataFile(): Promise<void> {
-  await fs.mkdir(DATA_DIR, { recursive: true });
-  try {
-    await fs.access(DATA_FILE);
-  } catch {
-    await fs.writeFile(DATA_FILE, "[]", "utf-8");
-  }
-}
-
 type SaveSubmissionExtra = {
   id?: string;
   qrDataUrl?: string;
@@ -33,64 +23,98 @@ type SaveSubmissionExtra = {
   status?: VisitStatus;
 };
 
+function payloadRecord(value: Prisma.JsonValue): Record<string, unknown> {
+  if (typeof value === "object" && value !== null && !Array.isArray(value)) {
+    return value as Record<string, unknown>;
+  }
+  return {};
+}
+
+function toRecord(row: {
+  id: string;
+  type: SubmissionType;
+  createdAt: Date;
+  status: VisitStatus | null;
+  payload: Prisma.JsonValue;
+  qrDataUrl: string | null;
+  verifyUrl: string | null;
+}): SubmissionRecord {
+  return {
+    id: row.id,
+    type: row.type,
+    createdAt: row.createdAt.toISOString(),
+    payload: payloadRecord(row.payload),
+    ...(row.qrDataUrl ? { qrDataUrl: row.qrDataUrl } : {}),
+    ...(row.verifyUrl ? { verifyUrl: row.verifyUrl } : {}),
+    ...(row.status ? { status: row.status } : {}),
+  };
+}
+
 export async function saveSubmission(
   type: SubmissionType,
   payload: Record<string, unknown>,
   extra?: SaveSubmissionExtra
 ): Promise<SubmissionRecord> {
-  await ensureDataFile();
-  const raw = await fs.readFile(DATA_FILE, "utf-8");
-  const list: SubmissionRecord[] = JSON.parse(raw);
-  const { id: extraId, ...rest } = extra ?? {};
-  const record: SubmissionRecord = {
-    id: extraId ?? crypto.randomUUID(),
-    type,
-    createdAt: new Date().toISOString(),
-    payload,
-    ...rest,
-  };
-  list.push(record);
-  await fs.writeFile(DATA_FILE, JSON.stringify(list, null, 2), "utf-8");
-  return record;
+  const { id: extraId, qrDataUrl, verifyUrl, status } = extra ?? {};
+  const { visitDate, visitTime } = visitColumnsFromPayload(type, payload);
+  const row = await prisma.submission.create({
+    data: {
+      id: extraId ?? crypto.randomUUID(),
+      type,
+      payload: JSON.parse(JSON.stringify(payload)) as Prisma.InputJsonValue,
+      qrDataUrl: qrDataUrl ?? null,
+      verifyUrl: verifyUrl ?? null,
+      status: status ?? null,
+      visitDate,
+      visitTime,
+    },
+  });
+  return toRecord(row);
 }
 
 export async function listSubmissions(): Promise<SubmissionRecord[]> {
-  await ensureDataFile();
-  const raw = await fs.readFile(DATA_FILE, "utf-8");
-  const list: SubmissionRecord[] = JSON.parse(raw);
-  return list.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  const rows = await prisma.submission.findMany({
+    orderBy: { createdAt: "desc" },
+  });
+  return rows.map(toRecord);
 }
 
 export async function getSubmissionById(id: string): Promise<SubmissionRecord | null> {
-  const list = await listSubmissions();
-  return list.find((item) => item.id === id) ?? null;
+  const row = await prisma.submission.findUnique({ where: { id } });
+  return row ? toRecord(row) : null;
+}
+
+export async function deleteSubmission(id: string): Promise<boolean> {
+  const existing = await prisma.submission.findUnique({ where: { id }, select: { id: true } });
+  if (!existing) return false;
+  await prisma.submission.delete({ where: { id } });
+  return true;
 }
 
 export async function getDailyVisitStats(limitDays = 30): Promise<Array<{ date: string; visits: number }>> {
-  const list = await listSubmissions();
+  const rows = await prisma.submission.findMany({
+    where: { type: "visitas" },
+    select: { createdAt: true },
+  });
   const counters = new Map<string, number>();
-  const onlyVisits = list.filter((item) => item.type === "visitas");
-
-  for (const item of onlyVisits) {
-    const date = item.createdAt.slice(0, 10);
+  for (const row of rows) {
+    const date = isoDateInTimeZone(row.createdAt, MEXICO_TZ);
     counters.set(date, (counters.get(date) ?? 0) + 1);
   }
 
-  const today = new Date();
+  const today = todayISO(MEXICO_TZ);
   const output: Array<{ date: string; visits: number }> = [];
-  for (let i = 0; i < limitDays; i++) {
-    const day = new Date(today);
-    day.setDate(today.getDate() - i);
-    const date = day.toISOString().slice(0, 10);
+  for (let i = limitDays - 1; i >= 0; i -= 1) {
+    const date = addDaysISO(today, -i);
     output.push({ date, visits: counters.get(date) ?? 0 });
   }
-
-  return output.reverse();
+  return output;
 }
 
 export async function listVisitsForDate(isoDate: string): Promise<SubmissionRecord[]> {
-  const list = await listSubmissions();
-  return list
-    .filter((item) => item.type === "visitas" && String(item.payload.fecha_preferida ?? "") === isoDate)
-    .sort((a, b) => String(a.payload.hora_aproximada ?? "").localeCompare(String(b.payload.hora_aproximada ?? "")));
+  const rows = await prisma.submission.findMany({
+    where: { type: "visitas", visitDate: isoDate },
+    orderBy: [{ visitTime: { sort: "asc", nulls: "first" } }, { createdAt: "asc" }],
+  });
+  return rows.map(toRecord);
 }

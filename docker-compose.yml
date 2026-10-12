@@ -1,0 +1,20 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ermita
+      POSTGRES_PASSWORD: ermita
+      POSTGRES_DB: ermita
+    volumes:
+      - ermita_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ermita -d ermita"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  ermita_pg:

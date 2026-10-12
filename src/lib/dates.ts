@@ -16,13 +16,17 @@ const MONTHS: Record<string, number> = {
   diciembre: 12,
 };
 
-export function todayISO(timeZone = MEXICO_TZ): string {
+export function isoDateInTimeZone(value: Date, timeZone = MEXICO_TZ): string {
   return new Intl.DateTimeFormat("en-CA", {
     timeZone,
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
-  }).format(new Date());
+  }).format(value);
+}
+
+export function todayISO(timeZone = MEXICO_TZ): string {
+  return isoDateInTimeZone(new Date(), timeZone);
 }
 
 export function addDaysISO(isoDate: string, days: number): string {

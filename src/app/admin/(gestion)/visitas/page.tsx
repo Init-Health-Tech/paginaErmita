@@ -43,6 +43,7 @@ export default async function AdminVisitasPage({
                 rows={rows}
                 mode="visitas"
                 csvHref="/api/admin/submissions?format=csv&type=visitas"
+                manage
               />
             </>
           ),
